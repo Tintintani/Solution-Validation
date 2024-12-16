@@ -1,0 +1,17 @@
+{
+    "workbook": [
+        {
+            "searchKey": "CiscoUmbrellaWorkbook",
+            "displayName": "Cisco Umbrella",
+            "description": "Gain insights into Cisco Umbrella activities, including the DNS, Proxy and Cloud Firewall data. Workbook shows general information along with threat landscape including categories, blocked destinations and URLs.",
+            "kind": "Workbook",
+            "dataTypes": "Cisco_Umbrella_dns_CL --Cisco_Umbrella_proxy_CL --Cisco_Umbrella_ip_CL --Cisco_Umbrella_cloudfirewall_CL --",
+            "dataConnectorId": "CiscoUmbrellaDataConnector",
+            "version": "1.0.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        }
+    ]
+}

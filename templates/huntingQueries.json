@@ -1,0 +1,184 @@
+{
+    "huntingQuery": [
+        {
+            "searchKey": "55393e5b-3f7e-4d40-85e5-38ef9ecd8484",
+            "displayName": "Cisco Umbrella - Higher values of count of the Same BytesIn size",
+            "description": "Calculate the count of BytesIn per Source-Destination pair over 24 hours. Higher values may indicate beaconing.",
+            "kind": "HuntingQuery",
+            "query": "let timeframe = 1d;Cisco_Umbrella | where EventType == \"proxylogs\"| where TimeGenerated > ago(timeframe)| summarize count() by SrcIpAddr,DstIpAddr, SrcBytes| sort by count_ desc| extend Message = \"Possible communication with C2\"| project Message, SrcIpAddr, DstIpAddr| extend IpCustomEntity = SrcIpAddr",
+            "tactics": [
+                "Command And Control"
+            ],
+            "techniques": [
+                "T1071"
+            ],
+            "version": "1.0.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        },
+        {
+            "searchKey": "c92741e6-8454-40bb-8830-069cb86946c6",
+            "displayName": "Cisco Umbrella - Anomalous FQDNs for domain",
+            "description": "Large number of FQDNs for domain may be indicator of suspicious domain.",
+            "kind": "HuntingQuery",
+            "query": "Cisco_Umbrella| where TimeGenerated > ago(24h)| where EventType == 'dnslogs'| extend replaced = replace(@'\\.$', @'', DnsQueryName)| extend Domain = extract(@'.*\\.(.*\\.[a-z]+)', 1, replaced)| extend fqdn = extract(@'(.*)\\..*\\.[a-z]+', 1, replaced)| summarize FQDNs = dcount(fqdn) by Domain| sort by FQDNs",
+            "tactics": [
+                "Command And Control"
+            ],
+            "techniques": [
+                "T1071"
+            ],
+            "version": "1.0.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        },
+        {
+            "searchKey": "de2ec986-ee24-465f-adf2-b718997074c1",
+            "displayName": "Cisco Umbrella - Requests to uncategorized resources",
+            "description": "Shows requests to URL where UrlCategory is not set.",
+            "kind": "HuntingQuery",
+            "query": "Cisco_Umbrella| where TimeGenerated > ago(24h)| where DvcAction =~ 'Allowed'| where UrlCategory == ''| project UrlOriginal, Identities| extend URLCustomEntity = UrlOriginal| extend AccountCustomEntity = Identities",
+            "tactics": [
+                "Initial Access"
+            ],
+            "techniques": [
+                "T1071"
+            ],
+            "version": "1.0.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        },
+        {
+            "searchKey": "975419eb-7041-419c-b8f0-c4bf513cf2b2",
+            "displayName": "Cisco Umbrella - High values of Uploaded Data",
+            "description": "A normal user activity consists mostly of downloading data. Uploaded data is usually small unless there is a file/data upload to a website. Calculate the sum of BytesOut per Source-Destination pair over 12/24 hours.",
+            "kind": "HuntingQuery",
+            "query": "let timeframe = 1d;Cisco_Umbrella | where EventType == \"proxylogs\"| where TimeGenerated > ago(timeframe)| summarize sum(SrcBytes) by SrcIpAddr,DstIpAddr| sort by sum_SrcBytes desc| project SrcIpAddr, DstIpAddr| extend IpCustomEntity = SrcIpAddr",
+            "tactics": [
+                "Exfiltration"
+            ],
+            "techniques": [
+                "T1020"
+            ],
+            "version": "1.0.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        },
+        {
+            "searchKey": "daf2f3cf-0f0d-45c1-b428-3c23d643859b",
+            "displayName": "Cisco Umbrella - Proxy 'Allowed' to unreliable categories.",
+            "description": "Shows allowed requests to URI categories which heavily are used in Initial Access stage by threat actiors and may contain malicious content.",
+            "kind": "HuntingQuery",
+            "query": "Cisco_Umbrella| where TimeGenerated > ago(24h)| where EventType == 'proxylogs'| where UrlCategory contains 'Dating' or UrlCategory contains 'Digital Postcards' or UrlCategory contains 'Freeware and Shareware' or UrlCategory contains 'Gambling' or UrlCategory contains  'Hacking' or UrlCategory contains 'Hunting' or UrlCategory contains 'Mobile Phones' or UrlCategory contains 'Software Updates' or UrlCategory contains 'URL Shortener' or UrlCategory contains  'Web Hosting'| where DvcAction == 'ALLOWED'| summarize TotalEvents = count() by UrlOriginal, SrcIpAddr| sort by TotalEvents| summarize listOfIps = make_set(SrcIpAddr) by UrlOriginal| extend URLCustomEntity = UrlOriginal",
+            "tactics": [
+                "Initial Access"
+            ],
+            "techniques": [
+                "T1189"
+            ],
+            "version": "1.0.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        },
+        {
+            "searchKey": "bd1457df-3e81-4218-a079-0963200c8d67",
+            "displayName": "Cisco Umbrella - DNS requests to unreliable categories.",
+            "description": "Shows requests to URI categories which heavily are used in Initial Access stage by threat actiors and may contain malicious content.",
+            "kind": "HuntingQuery",
+            "query": "Cisco_Umbrella| where TimeGenerated > ago(24h)| where EventType == 'dnslogs'| where UrlCategory contains 'Dating' or UrlCategory contains 'Digital Postcards' or UrlCategory contains 'Freeware and Shareware' or UrlCategory contains 'Gambling' or UrlCategory contains  'Hacking' or UrlCategory contains 'Hunting' or UrlCategory contains 'Mobile Phones' or UrlCategory contains 'Software Updates' or UrlCategory contains 'URL Shortener' or UrlCategory contains  'Web Hosting'| where DvcAction == 'Allowed'| summarize TotalEvents = count() by DnsQueryName, SrcIpAddr| sort by TotalEvents| summarize listOfIps = make_set(SrcIpAddr) by DnsQueryName| extend URLCustomEntity = DnsQueryName",
+            "tactics": [
+                "Initial Access"
+            ],
+            "techniques": [
+                "T1189"
+            ],
+            "version": "1.0.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        },
+        {
+            "searchKey": "26aebe0d-9a4f-456d-bbb9-9f4c9c5d28ca",
+            "displayName": "Cisco Umbrella - DNS Errors.",
+            "description": "Shows error DNS requests.",
+            "kind": "HuntingQuery",
+            "query": "Cisco_Umbrella| where TimeGenerated > ago(24h)| where EventType == 'dnslogs'| where DnsResponseCodeName != 'NOERROR'| extend URLCustomEntity = UrlOriginal| extend AccountCustomEntity = Identities| extend IPCustomEntity = SrcIpAddr",
+            "tactics": [
+                "Initial Access"
+            ],
+            "techniques": [
+                "T1189"
+            ],
+            "version": "1.0.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        },
+        {
+            "searchKey": "497d7250-87e1-49b1-a096-94f61c7ade9c",
+            "displayName": "Cisco Umbrella - Possible data exfiltration",
+            "description": "A normal user activity consists mostly of downloading data. Uploaded data is usually small unless there is a file/data upload to a website. Calculate the sum of BytesOut per Source-Destination pair over 12/24 hours.",
+            "kind": "HuntingQuery",
+            "query": "let timeframe = 1d;Cisco_Umbrella | where EventType == \"proxylogs\"| where TimeGenerated > ago(timeframe)| summarize sum(DstBytes) by SrcIpAddr,DstIpAddr| sort by sum_DstBytes desc| extend Message = \"Possible data exfiltration\"| extend IPCustomEntity = SrcIpAddr",
+            "tactics": [
+                "Exfiltration"
+            ],
+            "techniques": [
+                "T1020"
+            ],
+            "version": "1.0.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        },
+        {
+            "searchKey": "22e5e573-409b-433f-91de-50d6f0ad5a9e",
+            "displayName": "Cisco Umbrella - 'Blocked' User-Agents.",
+            "description": "Shows User-Agent values which requests were blocked",
+            "kind": "HuntingQuery",
+            "query": "Cisco_Umbrella| where TimeGenerated > ago(24h)| where DvcAction =~ 'Blocked'| summarize count() by HttpUserAgentOriginal| sort by count_",
+            "tactics": [
+                "Exfiltration"
+            ],
+            "techniques": [
+                "T1020"
+            ],
+            "version": "1.0.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        },
+        {
+            "searchKey": "85421f18-2de4-42ff-9ef4-058924dcb1bf",
+            "displayName": "Cisco Umbrella - Possible connection to C2.",
+            "description": "Calculate the count of BytesIn per Source-Destination pair over 12/24 hours. Higher values may indicate beaconing. C2 servers reply with the same data, making BytesIn value the same.",
+            "kind": "HuntingQuery",
+            "query": "let timeframe = 1d;Cisco_Umbrella | where EventType == \"proxylogs\"| where TimeGenerated > ago(timeframe)| summarize count() by SrcIpAddr, DstIpAddr, SrcBytes| sort by count_ desc| extend Message = \"Possible communication with C2\"| extend IPCustomEntity = SrcIpAddr",
+            "tactics": [
+                "Command And Control"
+            ],
+            "techniques": [
+                "T1071"
+            ],
+            "version": "1.0.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        }
+    ]
+}

@@ -1,0 +1,98 @@
+[
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentPackages/azuresentinel.azure-sentinel-solution-ciscoumbrella"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-ar-3v2jorre7shwc"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-ar-fkldu5dlyadi2"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-ar-kiyp72y7k4jai"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-ar-lf5g4s4gbgep6"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-ar-omfx5ftmmduaw"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-ar-rnfjvn4ucy3t6"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-ar-sv4bbjjmi26kc"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-ar-vsmggq6uge7ii"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-ar-vxk3472iqqils"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-ar-wzj62zip4yyba"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-dc-327zha3bs36om"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-hq-2rbcjq7ynmnfk"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-hq-43m26qq5clupo"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-hq-57bw4qbzru25e"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-hq-deujst7b7mtfi"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-hq-ekjm45qrk23s6"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-hq-evvx5eewsaivo"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-hq-ihayz62aplg6e"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-hq-nstwasctri3iy"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-hq-wtdtao2qtjqfo"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-hq-zk2yofilr4sus"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-lc-gtmri3o5ujtyw"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-lc-p7sqqhv3ci7tw"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-lc-swvj3f63bo5bu"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-lc-tyiepavkchynw"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-pl-dhgpfb42in6qw"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-pl-md5nnf6otqyns"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-pl-upn5lmsznqfkm"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-pl-yp4fzds3p2fkk"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-pr-23vfnbkd2tysg"
+    },
+    {
+        "id": "/subscriptions/476e4228-a5ee-463a-95b0-21798244ed27/resourceGroups/Tanishq_RG/providers/Microsoft.OperationalInsights/workspaces/Tanishq-SentinelWorkspace/providers/Microsoft.SecurityInsights/contentTemplates/Tanishq-SentinelWorkspace-wb-vq7hisnylkwxc"
+    }
+]

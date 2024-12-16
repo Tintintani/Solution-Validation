@@ -1,0 +1,17 @@
+{
+    "dataConnector": [
+        {
+            "searchKey": "CiscoUmbrellaDataConnector",
+            "displayName": "Cisco Umbrella (using Azure Functions)",
+            "description": "The Cisco Umbrella data connector provides the capability to ingest Cisco Umbrella events stored in Amazon S3 into Microsoft Sentinel using the Amazon S3 REST API. Refer to Cisco Umbrella log management documentation for more information.",
+            "kind": "DataConnector",
+            "dataTypes": "Cisco_Umbrella_dns_CL --Cisco_Umbrella_proxy_CL --Cisco_Umbrella_ip_CL --Cisco_Umbrella_cloudfirewall_CL --",
+            "provider": "Cisco",
+            "version": "1.0.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        }
+    ]
+}

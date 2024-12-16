@@ -1,0 +1,88 @@
+{
+    "playbook": [
+        {
+            "searchKey": "CiscoUmbrella-BlockDomain",
+            "displayName": "CiscoUmbrella-BlockDomain",
+            "description": "This playbook showcases an example of triggering an incident within a targeted Teams channel and opening up a ticket within Service Now. Additionally The playbook will also list playbooks that can be initiated from teams using an adaptive card and callbacks that will take action upon certain entities identified in the incident.",
+            "kind": "Playbook",
+            "prerequisites": "ServiceNow Instance URL, Username, and password.Access and authorization to enable API connectorsTeams Group ID, Channel ID and Alert details where the messages are to be posted in.",
+            "postDeployment": "",
+            "entities": [
+                "Account",
+                "2\ue946",
+                "URL",
+                "Host"
+            ],
+            "entitiesMultiple": "Account2\ue946URLHost",
+            "tags": "SyncNotificationTeams Response",
+            "version": "1.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        },
+        {
+            "searchKey": "CiscoUmbrella-AddIpToDestinationList",
+            "displayName": "CiscoUmbrella-AddIpToDestinationList",
+            "description": "This playbook showcases an example of triggering an incident within a targeted Teams channel and opening up a ticket within Service Now. Additionally The playbook will also list playbooks that can be initiated from teams using an adaptive card and callbacks that will take action upon certain entities identified in the incident.",
+            "kind": "Playbook",
+            "prerequisites": "ServiceNow Instance URL, Username, and password.Access and authorization to enable API connectorsTeams Group ID, Channel ID and Alert details where the messages are to be posted in.",
+            "postDeployment": "",
+            "entities": [
+                "Account",
+                "2\ue946",
+                "URL",
+                "Host"
+            ],
+            "entitiesMultiple": "Account2\ue946URLHost",
+            "tags": "SyncNotificationTeams Response",
+            "version": "1.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        },
+        {
+            "searchKey": "CiscoUmbrella-GetDomainInfo",
+            "displayName": "CiscoUmbrella-GetDomainInfo",
+            "description": "This playbook showcases an example of triggering an incident within a targeted Teams channel and opening up a ticket within Service Now. Additionally The playbook will also list playbooks that can be initiated from teams using an adaptive card and callbacks that will take action upon certain entities identified in the incident.",
+            "kind": "Playbook",
+            "prerequisites": "ServiceNow Instance URL, Username, and password.Access and authorization to enable API connectorsTeams Group ID, Channel ID and Alert details where the messages are to be posted in.",
+            "postDeployment": "",
+            "entities": [
+                "Account",
+                "2\ue946",
+                "URL",
+                "Host"
+            ],
+            "entitiesMultiple": "Account2\ue946URLHost",
+            "tags": "SyncNotificationTeams Response",
+            "version": "1.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        },
+        {
+            "searchKey": "CiscoUmbrella-AssignPolicyToIdentity",
+            "displayName": "CiscoUmbrella-AssignPolicyToIdentity",
+            "description": "This playbook showcases an example of triggering an incident within a targeted Teams channel and opening up a ticket within Service Now. Additionally The playbook will also list playbooks that can be initiated from teams using an adaptive card and callbacks that will take action upon certain entities identified in the incident.",
+            "kind": "Playbook",
+            "prerequisites": "ServiceNow Instance URL, Username, and password.Access and authorization to enable API connectorsTeams Group ID, Channel ID and Alert details where the messages are to be posted in.",
+            "postDeployment": "",
+            "entities": [
+                "Account",
+                "2\ue946",
+                "URL",
+                "Host"
+            ],
+            "entitiesMultiple": "Account2\ue946URLHost",
+            "tags": "SyncNotificationTeams Response",
+            "version": "1.0",
+            "source": "CiscoUmbrella",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Cisco Umbrella"
+        }
+    ]
+}
