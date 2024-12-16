@@ -19,9 +19,16 @@ jobs:
           repository: ${{github.event.pull_request.head.repo.full_name}}
           # persist-credentials: false 
           # fetch-depth: 0 
+      - name: Check and add origin remote
+        run: |
+          if ! git remote | grep -q origin; then
+            echo "Remote 'origin' not found. Adding it..."
+            git remote add origin https://github.com/<owner>/<repository>.git
+          else
+            echo "Remote 'origin' already exists."
+          fi
       - name: Get Modified Files
         run: |
-          git remote add origin https://github.com/Tintintani/Solution-Validation.git
           git fetch origin
           git diff --name-only origin/master ${{ github.event.pull_request.head.sha }}/../../../Solutions/ > changed_files.txt
           echo "changed_files=$(cat changed_files.txt)" >> $GITHUB_ENV
