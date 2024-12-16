@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Chekout pull request braanch
-        uses: actions/checkout@master
+        uses: actions/checkoutv2
         with:
           fetch-depth: 0 
       - name: Get Modified Files
         run: |
           git fetch origin master:refs/remotes/origin/master
-          git diff --name-only HEAD^1 HEAD > changed_files.txt
+          git diff --name-only origin/master ${{ github.events.pull_request.head.sha }} > changed_files.txt
           echo "changed_files=$(cat changed_files.txt)" >> $GITHUB_ENV
           cat changed_files.txt
