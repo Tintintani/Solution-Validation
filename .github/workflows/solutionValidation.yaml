@@ -22,7 +22,8 @@ jobs:
       - name: Get Modified Files
         run: |
           git remote
-          git fetch origin
-          git diff --name-only master ${{ github.event.pull_request.head.sha }}/../../../Solutions/ > changed_files.txt
+          git fetch origin\
+          git remote -v
+          git diff --name-only origin/master ${{ github.event.pull_request.head.sha }}/../../../Solutions/ > changed_files.txt
           echo "changed_files=$(cat changed_files.txt)" >> $GITHUB_ENV
           cat changed_files.txt
