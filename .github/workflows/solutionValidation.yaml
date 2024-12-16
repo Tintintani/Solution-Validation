@@ -19,11 +19,11 @@ jobs:
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
-          persist-credentials: false 
+          # persist-credentials: false 
           # fetch-depth: 0 
       - name: Get Modified Files
         run: |
-          git fetch origin
+          git fetch origin master:refs/remotes/origin/master
           git diff --name-only origin/master ${{ github.event.pull_request.head.sha }}/../../../Solutions/ > changed_files.txt
           echo "changed_files=$(cat changed_files.txt)" >> $GITHUB_ENV
           cat changed_files.txt
