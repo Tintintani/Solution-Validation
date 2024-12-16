@@ -16,10 +16,11 @@ jobs:
     steps:
       - name: Chekout pull request braanch
         uses: actions/checkout@master
-          # fetch-depth: 0 
+        with:
+          fetch-depth: 0 
       - name: Get Modified Files
         run: |
           git fetch origin master:refs/remotes/origin/master
-          git diff --name-only > changed_files.txt
+          git diff --name-only HEAD^1 HEAD > changed_files.txt
           echo "changed_files=$(cat changed_files.txt)" >> $GITHUB_ENV
           cat changed_files.txt
