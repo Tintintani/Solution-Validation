@@ -33,7 +33,7 @@ jobs:
 
       - name: Get Modified Files
         run: |
-          git diff --name-only HEAD^ ${{ github.event.pull_request.head.sha }}/../../../Solutions/ > changedFiles.txt
+          git diff --name-only HEAD^1 ${{ github.event.pull_request.head.sha }}/../../../Solutions/ > changedFiles.txt
           echo "CHANGED_FILES = $(cat changedFiles.txt)" >> $GITHUB_ENV
       - name: Setup Python
         uses: actions/setup-python@v2
