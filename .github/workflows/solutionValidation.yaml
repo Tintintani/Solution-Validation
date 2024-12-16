@@ -20,6 +20,6 @@ jobs:
       - name: Get Modified Files
         run: |
           git fetch origin master:refs/remotes/origin/master
-          git diff --name-only changed_files.txt
+          git diff --name-only > changed_files.txt
           echo "changed_files=$(cat changed_files.txt)" >> $GITHUB_ENV
           cat changed_files.txt
