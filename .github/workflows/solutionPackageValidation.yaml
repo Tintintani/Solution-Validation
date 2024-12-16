@@ -1,4 +1,6 @@
 name: Solution Package Validations
+permissions:
+  contents: write
 
 on: 
   pull_request:
