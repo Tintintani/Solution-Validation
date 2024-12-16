@@ -35,7 +35,7 @@ jobs:
         run: |
           git fetch origin
           git diff --name-only origin/master ${{ github.events.pull_request.head.sha }} > changedFiles.txt
-          CHANGED_FILES = $(cat changedFiles.txt) >> $GITHUB_ENV
+          ls
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
