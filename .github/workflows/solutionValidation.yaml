@@ -21,9 +21,8 @@ jobs:
           # fetch-depth: 0 
       - name: Get Modified Files
         run: |
-          git remote
+          git remote add origin https://github.com/Tintintani/Solution-Validation.git
           git fetch origin
-          git remote -v
-          git diff --name-only ${{ github.event.pull_request.head.sha }}/../../../Solutions/ > changed_files.txt
+          git diff --name-only origin/master ${{ github.event.pull_request.head.sha }}/../../../Solutions/ > changed_files.txt
           echo "changed_files=$(cat changed_files.txt)" >> $GITHUB_ENV
           cat changed_files.txt
