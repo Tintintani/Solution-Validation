@@ -18,10 +18,9 @@ jobs:
       - name: Chekout pull request braanch
         uses: actions/checkout@v2
         with:
-          ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
           # persist-credentials: false 
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Check and add origin remote
         run: |
           if ! git remote | grep -q origin; then
