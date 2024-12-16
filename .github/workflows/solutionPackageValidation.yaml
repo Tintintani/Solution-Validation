@@ -11,7 +11,7 @@ on:
     # Allows to run workflow manually from the Actions tab
     workflow_dispatch:
 
-    
+
 jobs:
   Run-SolutionPackage-Validation:
     name: Solution Package UI Testing - Testim.io
@@ -22,14 +22,7 @@ jobs:
         with:
           # persist-credentials: false 
           fetch-depth: 0
-      - name: Check and add origin remote
-        run: |
-          if ! git remote | grep -q origin; then
-            echo "Remote 'origin' not found. Adding it..."
-            git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Tintintani/Solution-Validation.git
-          else
-            echo "Remote 'origin' already exists."
-          fi
+
 
       - name: Get Modified Files
         run: |
