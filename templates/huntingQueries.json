@@ -1,184 +1,652 @@
 {
     "huntingQuery": [
         {
-            "searchKey": "55393e5b-3f7e-4d40-85e5-38ef9ecd8484",
-            "displayName": "Cisco Umbrella - Higher values of count of the Same BytesIn size",
-            "description": "Calculate the count of BytesIn per Source-Destination pair over 24 hours. Higher values may indicate beaconing.",
+            "searchKey": "46685737-676a-4084-8e98-31b2998062db",
+            "displayName": "Suspicious activity of STS Token related to Kubernetes worker node",
+            "description": "Suspicious activity of the STS token of an EC2 machine hosted by EKS (for example, by SSRF) indicates a possible token hijacking. An attacker may have stolen the token and could abuse its permissions to escalate privileges and move laterally in the cloud account.",
             "kind": "HuntingQuery",
-            "query": "let timeframe = 1d;Cisco_Umbrella | where EventType == \"proxylogs\"| where TimeGenerated > ago(timeframe)| summarize count() by SrcIpAddr,DstIpAddr, SrcBytes| sort by count_ desc| extend Message = \"Possible communication with C2\"| project Message, SrcIpAddr, DstIpAddr| extend IpCustomEntity = SrcIpAddr",
+            "query": "let aws_public_ips = externaldata(prefixes: string)[    h@'https://aka.ms/awspublicipaddresse/aws-public-ip-addresses/ip-ranges.json']with(format='multijson');let timeframe = 30m;let lookback = 12h;//Get the AccessKey in the STS token (IMDS) when EC2 service assumes the Role periodicallylet sts_token = AWSCloudTrail| where TimeGenerated >= ago (lookback)| where EventSource == \"sts.amazonaws.com\" and SourceIpAddress == \"ec2.amazonaws.com\"| extend instanceId = tostring(parse_json(RequestParameters).roleSessionName)| extend token = tostring(parse_json(ResponseElements).credentials.accessKeyId);//Identify if the EC2 belongs to ECS/EKSlet typeOfEC2 = AWSCloudTrail| where TimeGenerated >= ago (lookback)| extend instanceId = tostring(split(UserIdentityPrincipalid, \":\")[1])| join sts_token on instanceId| where UserAgent startswith \"kubernetes\"| project-away SourceIpAddress1, UserIdentityUserName1, UserIdentityArn1, TimeGenerated1;//Get the identities who used that STS token - this can be the EC2 which assumed it (legit),//but it can also be an external identity (attacker) which abuses the token permissions let tokenUsage = AWSCloudTrail| where TimeGenerated >= ago (timeframe)| join kind=inner typeOfEC2 on $left.UserIdentityAccessKeyId == $right.token| extend region = AWSRegion| project-away SourceIpAddress1, UserIdentityUserName1, UserIdentityArn1, TimeGenerated1;//Check whether the called identity is legitaws_public_ips| mv-expand todynamic(prefixes)| extend ip_prefix=tostring(todynamic(prefixes.['ip_prefix']))| extend region=tostring(todynamic(prefixes.['region']))| extend service=tostring(todynamic(prefixes.['service']))| project-away prefixes| where service == \"EC2\" | join kind=inner tokenUsage on region| where SourceIpAddress !contains \"amazonaws.com\"| where ipv4_is_private(SourceIpAddress) == false| extend IsInRange = ipv4_is_in_range(SourceIpAddress, ip_prefix)| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName, AssumedRoleArn = UserIdentityArn| summarize timestamp=arg_max(timestamp,*), r = make_set(IsInRange) by SourceIpAddress, UserIdentityUserName, UserIdentityArn| where not (set_has_element(r, true))| project-away ip_prefix, IsInRange",
             "tactics": [
-                "Command And Control"
+                "Credential Access"
             ],
             "techniques": [
-                "T1071"
+                "T1528"
             ],
             "version": "1.0.0",
-            "source": "CiscoUmbrella",
+            "source": "Amazon Web Services",
             "author": "Microsoft",
             "support": "Microsoft Corporation",
-            "solutionSearchName": "Cisco Umbrella"
+            "solutionSearchName": "Amazon Web Services"
         },
         {
-            "searchKey": "c92741e6-8454-40bb-8830-069cb86946c6",
-            "displayName": "Cisco Umbrella - Anomalous FQDNs for domain",
-            "description": "Large number of FQDNs for domain may be indicator of suspicious domain.",
+            "searchKey": "81a8880f-cc20-40ce-98d6-2fc6a1c5b9a4",
+            "displayName": "Suspicious EC2 launched without a key pair",
+            "description": "An attacker with limited permissions, or a sophisticated attacker disguising his activity, may have launched an EC2 instance without a key pair, allowing him to execute code on the machine using the UserData attribute (for example, by executing a reverse shell).",
             "kind": "HuntingQuery",
-            "query": "Cisco_Umbrella| where TimeGenerated > ago(24h)| where EventType == 'dnslogs'| extend replaced = replace(@'\\.$', @'', DnsQueryName)| extend Domain = extract(@'.*\\.(.*\\.[a-z]+)', 1, replaced)| extend fqdn = extract(@'(.*)\\..*\\.[a-z]+', 1, replaced)| summarize FQDNs = dcount(fqdn) by Domain| sort by FQDNs",
+            "query": "AWSCloudTrail| where EventName == \"RunInstances\" and isempty(ErrorCode) and isempty(ErrorMessage)| extend items = tostring(parse_json(RequestParameters).instancesSet.items)| mv-expand todynamic(items)| extend keyName=tostring(todynamic(items.['keyName']))| where isempty(keyName) and RequestParameters contains \"userData\" and SourceIpAddress !contains \"amazonaws.com\"| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
             "tactics": [
-                "Command And Control"
+                "Execution"
             ],
             "techniques": [
-                "T1071"
+                "T1204"
             ],
             "version": "1.0.0",
-            "source": "CiscoUmbrella",
+            "source": "Amazon Web Services",
             "author": "Microsoft",
             "support": "Microsoft Corporation",
-            "solutionSearchName": "Cisco Umbrella"
+            "solutionSearchName": "Amazon Web Services"
         },
         {
-            "searchKey": "de2ec986-ee24-465f-adf2-b718997074c1",
-            "displayName": "Cisco Umbrella - Requests to uncategorized resources",
-            "description": "Shows requests to URL where UrlCategory is not set.",
+            "searchKey": "82ecf967-d6e9-4757-8f5d-42c562a8f05f",
+            "displayName": "Suspicious activity of STS token related to EC2",
+            "description": "Suspicious activity of the STS token of an EC2 machine hosted by ECS (for example, by SSRF) indicates a possible token hijacking. An attacker may have stolen the token and could abuse its permissions to escalate privileges and move laterally in the cloud account.",
             "kind": "HuntingQuery",
-            "query": "Cisco_Umbrella| where TimeGenerated > ago(24h)| where DvcAction =~ 'Allowed'| where UrlCategory == ''| project UrlOriginal, Identities| extend URLCustomEntity = UrlOriginal| extend AccountCustomEntity = Identities",
+            "query": "let aws_public_ips = externaldata(prefixes: string)[    h@'https://aka.ms/awspublicipaddresse/aws-public-ip-addresses/ip-ranges.json']with(format='multijson');let timeframe = 30m;let lookback = 12h;//Get the AccessKey in the STS token (IMDS) when EC2 service assumes the Role periodicallylet sts_token = AWSCloudTrail| where TimeGenerated >= ago (lookback)| where EventSource == \"sts.amazonaws.com\" and SourceIpAddress == \"ec2.amazonaws.com\"| extend instanceId = tostring(parse_json(RequestParameters).roleSessionName)| extend token = tostring(parse_json(ResponseElements).credentials.accessKeyId);//Identify if the EC2 belongs to ECS/EKSlet typeOfEC2 = AWSCloudTrail| where TimeGenerated >= ago (lookback)| extend instanceId = tostring(split(UserIdentityPrincipalid, \":\")[1])| join sts_token on instanceId| where UserAgent !startswith \"kubernetes\" or UserAgent !startswith \"Amazon ECS Agent\"| project-away SourceIpAddress1, UserIdentityUserName1, UserIdentityArn1, TimeGenerated1;//Get the identities who used that STS token - this can be the EC2 which assumed it (legit),//but it can also be an external identity (attacker) which abuses the token permissions let tokenUsage = AWSCloudTrail| where TimeGenerated >= ago (timeframe)| join kind=inner typeOfEC2 on $left.UserIdentityAccessKeyId == $right.token| extend region = AWSRegion| project-away SourceIpAddress1, UserIdentityUserName1, UserIdentityArn1, TimeGenerated1;//Check whether the called identity is legitaws_public_ips| mv-expand todynamic(prefixes)| extend ip_prefix=tostring(todynamic(prefixes.['ip_prefix']))| extend region=tostring(todynamic(prefixes.['region']))| extend service=tostring(todynamic(prefixes.['service']))| project-away prefixes| where service == \"EC2\" | join kind=inner tokenUsage on region| where SourceIpAddress !contains \"amazonaws.com\"| where ipv4_is_private(SourceIpAddress) == false| extend IsInRange = ipv4_is_in_range(SourceIpAddress, ip_prefix)| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName, AssumedRoleArn = UserIdentityArn| summarize timestamp=arg_max(timestamp,*), r = make_set(IsInRange) by SourceIpAddress, UserIdentityUserName, UserIdentityArn| where not (set_has_element(r, true))| project-away ip_prefix, IsInRange",
             "tactics": [
-                "Initial Access"
+                "Credential Access"
             ],
             "techniques": [
-                "T1071"
+                "T1528"
             ],
             "version": "1.0.0",
-            "source": "CiscoUmbrella",
+            "source": "Amazon Web Services",
             "author": "Microsoft",
             "support": "Microsoft Corporation",
-            "solutionSearchName": "Cisco Umbrella"
+            "solutionSearchName": "Amazon Web Services"
         },
         {
-            "searchKey": "975419eb-7041-419c-b8f0-c4bf513cf2b2",
-            "displayName": "Cisco Umbrella - High values of Uploaded Data",
-            "description": "A normal user activity consists mostly of downloading data. Uploaded data is usually small unless there is a file/data upload to a website. Calculate the sum of BytesOut per Source-Destination pair over 12/24 hours.",
+            "searchKey": "b9b0fd12-d72d-4f66-a013-c1acdeea2670",
+            "displayName": "RDS instance master password changed",
+            "description": "Detected change of the RDS Master password. Verify if this was intentional, or if it was caused by a malicious actor.",
             "kind": "HuntingQuery",
-            "query": "let timeframe = 1d;Cisco_Umbrella | where EventType == \"proxylogs\"| where TimeGenerated > ago(timeframe)| summarize sum(SrcBytes) by SrcIpAddr,DstIpAddr| sort by sum_SrcBytes desc| project SrcIpAddr, DstIpAddr| extend IpCustomEntity = SrcIpAddr",
+            "query": "AWSCloudTrail| where  EventName == \"ModifyDBCluster\" and isempty(ErrorCode) and isempty(ErrorMessage)| where isnotempty(tostring(parse_json(RequestParameters).masterUserPassword))| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
             "tactics": [
-                "Exfiltration"
+                "Privilege Escalation"
             ],
             "techniques": [
-                "T1020"
+                "T1484"
             ],
             "version": "1.0.0",
-            "source": "CiscoUmbrella",
+            "source": "Amazon Web Services",
             "author": "Microsoft",
             "support": "Microsoft Corporation",
-            "solutionSearchName": "Cisco Umbrella"
+            "solutionSearchName": "Amazon Web Services"
         },
         {
-            "searchKey": "daf2f3cf-0f0d-45c1-b428-3c23d643859b",
-            "displayName": "Cisco Umbrella - Proxy 'Allowed' to unreliable categories.",
-            "description": "Shows allowed requests to URI categories which heavily are used in Initial Access stage by threat actiors and may contain malicious content.",
+            "searchKey": "bf130d1d-702b-4af6-9528-8bc4229e59f4",
+            "displayName": "Multiple failed login attempts to an existing user without MFA",
+            "description": "Failed brute force attempt detected on an existing user without MFA configurations.",
             "kind": "HuntingQuery",
-            "query": "Cisco_Umbrella| where TimeGenerated > ago(24h)| where EventType == 'proxylogs'| where UrlCategory contains 'Dating' or UrlCategory contains 'Digital Postcards' or UrlCategory contains 'Freeware and Shareware' or UrlCategory contains 'Gambling' or UrlCategory contains  'Hacking' or UrlCategory contains 'Hunting' or UrlCategory contains 'Mobile Phones' or UrlCategory contains 'Software Updates' or UrlCategory contains 'URL Shortener' or UrlCategory contains  'Web Hosting'| where DvcAction == 'ALLOWED'| summarize TotalEvents = count() by UrlOriginal, SrcIpAddr| sort by TotalEvents| summarize listOfIps = make_set(SrcIpAddr) by UrlOriginal| extend URLCustomEntity = UrlOriginal",
+            "query": "AWSCloudTrail| where EventName == \"ConsoleLogin\"| where tostring(parse_json(ResponseElements).ConsoleLogin) == \"Failure\" and tostring(parse_json(AdditionalEventData).MFAUsed) == \"No\"| summarize arg_min(TimeGenerated, *), failed_attempts=count() by UserIdentityUserName, SourceIpAddress| where failed_attempts > 4| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
             "tactics": [
-                "Initial Access"
+                "Credential Access"
             ],
             "techniques": [
-                "T1189"
+                "T1110"
             ],
             "version": "1.0.0",
-            "source": "CiscoUmbrella",
+            "source": "Amazon Web Services",
             "author": "Microsoft",
             "support": "Microsoft Corporation",
-            "solutionSearchName": "Cisco Umbrella"
+            "solutionSearchName": "Amazon Web Services"
         },
         {
-            "searchKey": "bd1457df-3e81-4218-a079-0963200c8d67",
-            "displayName": "Cisco Umbrella - DNS requests to unreliable categories.",
-            "description": "Shows requests to URI categories which heavily are used in Initial Access stage by threat actiors and may contain malicious content.",
+            "searchKey": "77d0aadc-aaea-4346-b61a-bf7ac6b71bba",
+            "displayName": "Lambda layer imported from external account",
+            "description": "Detected an external account adding lambda layer, which attackers could use to inject a backdoor inside the lambda function. If this is the case, make sure to remove the layer from the function.",
             "kind": "HuntingQuery",
-            "query": "Cisco_Umbrella| where TimeGenerated > ago(24h)| where EventType == 'dnslogs'| where UrlCategory contains 'Dating' or UrlCategory contains 'Digital Postcards' or UrlCategory contains 'Freeware and Shareware' or UrlCategory contains 'Gambling' or UrlCategory contains  'Hacking' or UrlCategory contains 'Hunting' or UrlCategory contains 'Mobile Phones' or UrlCategory contains 'Software Updates' or UrlCategory contains 'URL Shortener' or UrlCategory contains  'Web Hosting'| where DvcAction == 'Allowed'| summarize TotalEvents = count() by DnsQueryName, SrcIpAddr| sort by TotalEvents| summarize listOfIps = make_set(SrcIpAddr) by DnsQueryName| extend URLCustomEntity = DnsQueryName",
+            "query": "AWSCloudTrail| where (EventName startswith \"UpdateFunctionConfiguration\" or EventName startswith \"CreateFunction\") and isempty(ErrorCode) and isempty(ErrorMessage)| extend layers = parse_json(tostring((parse_json(RequestParameters)))).layers| extend accId = split(parse_json(tostring((parse_json(RequestParameters)))).layers,\":\",4)| mv-expand accId| where layers <> \"\" and layers !has RecipientAccountId// Exclude AWS Owned AccIds (built-in layers)| where accId !in (\"249908578461\",\"668099181075\",\"468957933125\",\"399891621064\",\"325793726646\",\"118857876118\",\"296580773974\",\"961244031340\",\"631267018583\",\"817496625479\",\"778625758767\",\"292169987271\",\"642425348156\",\"142628438157\",\"959311844005\",\"640010853179\",\"259788987135\",\"420165488524\",\"683298794825\",\"382066503313\",\"556739011827\",\"138526772879\",\"027255383542\",\"728743619870\",\"958113053741\",\"359756378197\",\"039592058896\",\"066940009817\",\"434848589818\",\"282860088358\",\"493207061005\",\"646970417810\",\"203683718741\",\"615057806174\",\"615084187847\",\"630222743974\",\"980059726660\",\"706869817123\",\"826293736237\",\"421114256042\",\"080788657173\",\"418787028745\",\"554480029851\",\"000010852771\",\"574348263942\",\"559955524753\",\"946561847325\",\"946746059096\",\"580247275435\",\"012438385374\",\"519774774795\",\"488211338238\",\"339249233099\",\"285320876703\")| distinct TimeGenerated, EventName, SourceIpAddress, UserIdentityArn, UserIdentityUserName, tostring(layers)| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
             "tactics": [
-                "Initial Access"
+                "Persistence"
             ],
             "techniques": [
-                "T1189"
+                "T1525"
             ],
             "version": "1.0.0",
-            "source": "CiscoUmbrella",
+            "source": "Amazon Web Services",
             "author": "Microsoft",
             "support": "Microsoft Corporation",
-            "solutionSearchName": "Cisco Umbrella"
+            "solutionSearchName": "Amazon Web Services"
         },
         {
-            "searchKey": "26aebe0d-9a4f-456d-bbb9-9f4c9c5d28ca",
-            "displayName": "Cisco Umbrella - DNS Errors.",
-            "description": "Shows error DNS requests.",
+            "searchKey": "e73ebd34-4f04-4684-a5f0-dba820127ce8",
+            "displayName": "CreatePolicyVersion with excessive permissions",
+            "description": "A policy with excessive permissions detected. Attacker could use that policy to escalate privileges and for malicious activities. Verify the policy creation with the entity.",
             "kind": "HuntingQuery",
-            "query": "Cisco_Umbrella| where TimeGenerated > ago(24h)| where EventType == 'dnslogs'| where DnsResponseCodeName != 'NOERROR'| extend URLCustomEntity = UrlOriginal| extend AccountCustomEntity = Identities| extend IPCustomEntity = SrcIpAddr",
+            "query": "let check_actions = AWSCloudTrail| where EventName == \"CreatePolicyVersion\" and isempty(ErrorCode) and isempty(ErrorMessage)| extend state=parse_json(parse_json(replace_string(tostring(parse_json(RequestParameters)['policyDocument']),'\\\\\"','\"')).['Statement'])| mv-expand state| extend Action= tostring(parse_json(state.['Action'][0])), Effect=tostring(parse_json(state.['Effect']))| where Action has \"*\" and Effect == 'Allow'| distinct AwsEventId;AWSCloudTrail| where EventName == \"CreatePolicyVersion\" and isempty(ErrorCode) and isempty(ErrorMessage)| join kind=inner (check_actions) on AwsEventId| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| project-away AwsEventId1",
             "tactics": [
-                "Initial Access"
+                "Privilege Escalation"
             ],
             "techniques": [
-                "T1189"
+                "T1484"
             ],
             "version": "1.0.0",
-            "source": "CiscoUmbrella",
+            "source": "Amazon Web Services",
             "author": "Microsoft",
             "support": "Microsoft Corporation",
-            "solutionSearchName": "Cisco Umbrella"
+            "solutionSearchName": "Amazon Web Services"
         },
         {
-            "searchKey": "497d7250-87e1-49b1-a096-94f61c7ade9c",
-            "displayName": "Cisco Umbrella - Possible data exfiltration",
-            "description": "A normal user activity consists mostly of downloading data. Uploaded data is usually small unless there is a file/data upload to a website. Calculate the sum of BytesOut per Source-Destination pair over 12/24 hours.",
+            "searchKey": "2dd2143b-6667-4a7a-b04f-98d22caeffac",
+            "displayName": "Lambda UpdateFunctionCode",
+            "description": "This analytic is designed to detect an IAM user updating AWS lambda code via AWS CLI to gain persistent, further access into your AWS environment and to facilitate panting backdoors. An attacker may upload malicious code/binary to a lambda function which will be executed automatically when the function is triggered.",
             "kind": "HuntingQuery",
-            "query": "let timeframe = 1d;Cisco_Umbrella | where EventType == \"proxylogs\"| where TimeGenerated > ago(timeframe)| summarize sum(DstBytes) by SrcIpAddr,DstIpAddr| sort by sum_DstBytes desc| extend Message = \"Possible data exfiltration\"| extend IPCustomEntity = SrcIpAddr",
+            "query": "AWSCloudTrail| where EventName startswith 'UpdateFunctionCode' and EventSource == \"lambda.amazonaws.com\" and UserIdentityType =='IAMUser' and isempty(ErrorCode) and isempty(ErrorMessage)| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
             "tactics": [
-                "Exfiltration"
+                "Execution"
             ],
             "techniques": [
-                "T1020"
+                "T1204"
             ],
             "version": "1.0.0",
-            "source": "CiscoUmbrella",
+            "source": "Amazon Web Services",
             "author": "Microsoft",
             "support": "Microsoft Corporation",
-            "solutionSearchName": "Cisco Umbrella"
+            "solutionSearchName": "Amazon Web Services"
         },
         {
-            "searchKey": "22e5e573-409b-433f-91de-50d6f0ad5a9e",
-            "displayName": "Cisco Umbrella - 'Blocked' User-Agents.",
-            "description": "Shows User-Agent values which requests were blocked",
+            "searchKey": "70a6e84f-6f3b-4ce1-83d6-ea6df9e7a9dd",
+            "displayName": "Suspicious activity of STS token related to Lambda",
+            "description": "Suspicious activity of the STS token of a Lambda function (for example, by SSRF) indicates a possible token hijacking. An attacker may have stolen the token and could abuse its permissions to escalate privileges and move laterally in the cloud account.",
             "kind": "HuntingQuery",
-            "query": "Cisco_Umbrella| where TimeGenerated > ago(24h)| where DvcAction =~ 'Blocked'| summarize count() by HttpUserAgentOriginal| sort by count_",
+            "query": "let aws_public_ips = externaldata(prefixes: string)[    h@'https://aka.ms/awspublicipaddresse/aws-public-ip-addresses/ip-ranges.json']with(format='multijson');let timeframe = 30m;let lookback = 12h;//Get the AccessKey in the STS token when Lambda service assumes the Role periodically (max assumed session can be 12h)let sts_token = AWSCloudTrail| where TimeGenerated >= ago (lookback)| where EventSource == \"sts.amazonaws.com\" and SourceIpAddress == \"lambda.amazonaws.com\"| extend instanceId = tostring(parse_json(RequestParameters).roleSessionName)| extend token = tostring(parse_json(ResponseElements).credentials.accessKeyId);//Get the identities who used that STS token - this can be the Lambda function itself which assumed it (legit),//but it can also be an external identity which abuses the token permissionslet tokenUsage = AWSCloudTrail| where TimeGenerated >= ago (timeframe)| join kind=inner sts_token on $left.UserIdentityAccessKeyId == $right.token| extend region = AWSRegion1| project-away SourceIpAddress1, UserIdentityUserName1, UserIdentityArn1, TimeGenerated1;//Check whether the called identity is legitaws_public_ips| mv-expand todynamic(prefixes)| extend ip_prefix=tostring(todynamic(prefixes.['ip_prefix']))| extend region=tostring(todynamic(prefixes.['region']))| extend service=tostring(todynamic(prefixes.['service']))| project-away prefixes| where service == \"AMAZON\" | join kind=inner tokenUsage on region| where SourceIpAddress !contains \"amazonaws.com\"| where ipv4_is_private(SourceIpAddress) == false| extend IsInRange = ipv4_is_in_range(SourceIpAddress, ip_prefix)| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName, AssumedRoleArn = UserIdentityArn| summarize timestamp=arg_max(timestamp,*), r = make_set(IsInRange) by SourceIpAddress, UserIdentityUserName, UserIdentityArn| where not (set_has_element(r, true))| project-away ip_prefix, IsInRange",
             "tactics": [
-                "Exfiltration"
+                "Credential Access"
             ],
             "techniques": [
-                "T1020"
+                "T1528"
             ],
             "version": "1.0.0",
-            "source": "CiscoUmbrella",
+            "source": "Amazon Web Services",
             "author": "Microsoft",
             "support": "Microsoft Corporation",
-            "solutionSearchName": "Cisco Umbrella"
+            "solutionSearchName": "Amazon Web Services"
         },
         {
-            "searchKey": "85421f18-2de4-42ff-9ef4-058924dcb1bf",
-            "displayName": "Cisco Umbrella - Possible connection to C2.",
-            "description": "Calculate the count of BytesIn per Source-Destination pair over 12/24 hours. Higher values may indicate beaconing. C2 servers reply with the same data, making BytesIn value the same.",
+            "searchKey": "d82ea1db-f600-4c9e-8ba8-d271e9c12eb8",
+            "displayName": "Lambda function throttled",
+            "description": "Detected Lambda function throttled. Attacker could use this technique to result in Denial of Service. More about this API at https://docs.aws.amazon.com/lambda/latest/dg/API_PutFunctionConcurrency.html ",
             "kind": "HuntingQuery",
-            "query": "let timeframe = 1d;Cisco_Umbrella | where EventType == \"proxylogs\"| where TimeGenerated > ago(timeframe)| summarize count() by SrcIpAddr, DstIpAddr, SrcBytes| sort by count_ desc| extend Message = \"Possible communication with C2\"| extend IPCustomEntity = SrcIpAddr",
+            "query": "AWSCloudTrail| where  EventName startswith \"PutFunctionConcurrency\" and isempty(ErrorCode) and isempty(ErrorMessage)| where tostring(parse_json(RequestParameters).reservedConcurrentExecutions) == \"0\"| project TimeGenerated, EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, UserIdentityUserName, SessionMfaAuthenticated, SourceIpAddress, AWSRegion, EventSource, AdditionalEventData,UserIdentityArn, ResponseElements, FunctionName = tostring(parse_json(RequestParameters).functionName)| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = FunctionName",
             "tactics": [
-                "Command And Control"
+                "Impact"
             ],
             "techniques": [
-                "T1071"
+                "T1498"
             ],
             "version": "1.0.0",
-            "source": "CiscoUmbrella",
+            "source": "Amazon Web Services",
             "author": "Microsoft",
             "support": "Microsoft Corporation",
-            "solutionSearchName": "Cisco Umbrella"
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "5b6ee21d-da53-46eb-827c-eab2a9ba3d2f",
+            "displayName": "Suspicious credential token access of valid IAM Roles",
+            "description": "Adversaries may generate temporary credentials of existing privileged IAM roles to access AWS resources that were not previously accessible to perform malicious actions. The credentials may be generated by trusted IAM user or via AWS Cloud Instance Metadata API.This query will look for AWS STS API Assume Role operations for RoleArn (Role Amazon Resource Names) which was not historically seen.You can also limit the query to only sensitive IAM Roles which needs to be monitored.Read more about ingest custom logs using Logstash at https://github.com/Azure/Azure-Sentinel/wiki/Ingest-Custom-Logs-LogStashAWS API AssumeRole at https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html and AWS Instance Metadata API at https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html ",
+            "kind": "HuntingQuery",
+            "query": "let starttime = todatetime('{{StartTimeISO}}');let endtime = todatetime('{{EndTimeISO}}');let lookback = starttime - 14d;// Generating historical table of AssumeRole operations for IAM Roles to be compared with last 24 hourAWSCloudTrail| where TimeGenerated between (starttime..endtime)| where EventName == \"AssumeRole\" | extend RoleArn = tostring(parse_json(RequestParameters).roleArn)| project TimeGenerated, EventSource, EventName, UserIdentityType, UserIdentityInvokedBy , SourceIpAddress, RoleArn// Doing Leftanti join to find new AssumeRole operation for IAM role which was not seen historically generated from previous table.| join kind= leftanti(  AWSCloudTrail  | where TimeGenerated  between (lookback..starttime)  | where EventName == \"AssumeRole\" | extend RoleArn = tostring(parse_json(RequestParameters).roleArn)  | project TimeGenerated, EventSource, EventName, UserIdentityType, UserIdentityInvokedBy , SourceIpAddress, RoleArn) on RoleArn, UserIdentityInvokedBy| summarize EventCount = count(), StartTimeUtc = min(TimeGenerated), EndTimeUtc = max(TimeGenerated) by RoleArn, EventSource, EventName, UserIdentityType, UserIdentityInvokedBy, SourceIpAddress| extend timestamp = StartTimeUtc, IPCustomEntity = SourceIpAddress, AccountCustomEntity = tostring(split(RoleArn, \"/\")[1])",
+            "tactics": [
+                "Initial Access,Defense Evasion"
+            ],
+            "techniques": [
+                "T1078"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "7e258a45-b356-44f6-9a62-2643cef7b869",
+            "displayName": "IAM AccessDenied discovery events",
+            "description": "The following detection identifies excessive AccessDenied events within an hour timeframe. It is possible that an access key to AWS may have been stolen and is being misused to perform discovery events.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where ErrorMessage in (\"Access Denied\",\"AccessDenied\") and UserIdentityType == 'IAMUser' and UserAgent !endswith \".amazonaws.com\"| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| summarize failures = count(), Source_IP_Addresses=make_set(SourceIpAddress) by bin(TimeGenerated, 1h), UserIdentityUserName, UserIdentityArn| where failures >= 5",
+            "tactics": [
+                "Discovery"
+            ],
+            "techniques": [
+                "T1087"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "13afb771-5d55-4d69-a745-83d2fc69a923",
+            "displayName": "Failed brute force on S3 bucket",
+            "description": "Detected failed brute attempt on S3 bucket. If it is not an anonymous principle, verify with the user.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where EventName == \"GetObject\" and not(isempty(ErrorCode) and isempty(ErrorMessage))| where UserIdentityAccountId == \"ANONYMOUS_PRINCIPAL\" or UserIdentityAccessKeyId <> RecipientAccountId| extend bucketName = tostring(parse_json(RequestParameters).bucketName), keyName = tostring(parse_json(RequestParameters).key)| summarize arg_max(TimeGenerated, *), failed_attempts = dcount(keyName) by UserIdentityAccountId, SourceIpAddress, bucketName| where failed_attempts > 20| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName, bucketName",
+            "tactics": [
+                "Discovery"
+            ],
+            "techniques": [
+                "T1619"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "4055466c-8a84-44c6-91d0-46469f3ba0b9",
+            "displayName": "New AccessKey created for Root user",
+            "description": "Attackers with the CreateAccessKey permissions for other users can create an access Key ID and secret access key belonging to another user in the AWS environment for privilege escalation.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail  | where  EventName == \"CreateAccessKey\" and tostring(parse_json(RequestParameters).userName) == \"Root\" and isempty(ErrorCode) and isempty(ErrorMessage)  | project TimeGenerated, EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent,   UserIdentityUserName, SessionMfaAuthenticated, SourceIpAddress, AWSRegion, EventSource,UserIdentityArn, AdditionalEventData, ResponseElements, RequestParameters  | extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))  | extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Persistence"
+            ],
+            "techniques": [
+                "T1078"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "e1a91db8-f2b3-4531-bff6-da133d4f4f1a",
+            "displayName": "IAM Privilege Escalation by Instance Profile attachment",
+            "description": "An instance profile is a container for an IAM role that you can use to pass role information to an EC2 instance when the instance start.Identifies when existing role is removed and new/existing high privileged role is added to instance profile.Any instance with this instance profile attached is able to perform privileged operations.AWS Instance Profile: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.htmland CloudGoat - IAM PrivilegeEscalation by Attachment: https://github.com/RhinoSecurityLabs/cloudgoat/tree/master/scenarios/iam_privesc_by_attachment ",
+            "kind": "HuntingQuery",
+            "query": "// Creating separate table for RemoveRoleToInstanceProfilelet RemoveRole=AWSCloudTrail| where  EventName in~ (\"RemoveRoleFromInstanceProfile\") and isempty(ErrorMessage)| extend RoleRemoved = tostring(parse_json(RequestParameters).roleName), InstanceProfileName = tostring(parse_json(RequestParameters).instanceProfileName), TimeRemoved=TimeGenerated| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| summarize RoleRemovedCount= dcount(TimeRemoved) by TimeRemoved, EventName, EventTypeName, UserIdentityArn, UserIdentityUserName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, SourceIpAddress, AWSRegion, EventSource, RoleRemoved, InstanceProfileName;// Creating separate table for AddRoleToInstanceProfilelet AddRole=AWSCloudTrail| where  EventName in~ (\"AddRoleToInstanceProfile\") and isempty(ErrorMessage)| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend RoleAdded = tostring(parse_json(RequestParameters).roleName), InstanceProfileName = tostring(parse_json(RequestParameters).instanceProfileName), TimeAdded=TimeGenerated| summarize RoleAddedCount= dcount(TimeAdded) by TimeAdded, EventName, EventTypeName, UserIdentityArn, UserIdentityUserName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, SourceIpAddress, AWSRegion, EventSource, RoleAdded, InstanceProfileName;//Joining both operations from the same source IP, user and instance profile nameRemoveRole| join kind= inner (   AddRole ) on AWSRegion,SourceIpAddress, InstanceProfileName, UserIdentityUserName| where TimeAdded  > TimeRemoved // Checking if RoleAdd operation was performed after removal| summarize TotalCount=count() by TimeAdded, TimeRemoved, RoleAdded, RoleRemoved, UserIdentityUserName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent,SourceIpAddress, AWSRegion, EventSource, RoleRemovedCount, RoleAddedCount| extend timestamp = iff(TimeAdded > TimeRemoved,TimeAdded, TimeRemoved), IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Privilege Escalation"
+            ],
+            "techniques": [
+                "T1098"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "05167149-4670-4a9f-b34e-5a0a92243194",
+            "displayName": "Modification of subnet attributes",
+            "description": "An attacker could modify subnet attributes in order to access resources he couldn't access before.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where  EventName == \"ModifySubnetAttribute\" and isempty(ErrorCode) and isempty(ErrorMessage)| project TimeGenerated, EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, UserIdentityUserName, UserIdentityArn, SessionMfaAuthenticated, SourceIpAddress, AWSRegion, EventSource, AdditionalEventData, ResponseElements| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Defense Evasion"
+            ],
+            "techniques": [
+                "T1562"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "3b7df29e-a798-4b6b-9ef7-73b9a3cf56a2",
+            "displayName": "Modification of route-table attributes",
+            "description": "An attacker could modify route-table attributes in order to access resources he couldn't access before.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where  EventName in (\"CreateRoute\",\"DeleteRoute\",\"ReplaceRoute\") and isempty(ErrorCode) and isempty(ErrorMessage)| project TimeGenerated, EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, UserIdentityUserName, SessionMfaAuthenticated,UserIdentityArn, SourceIpAddress, AWSRegion, EventSource, AdditionalEventData, ResponseElements| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Defense Evasion"
+            ],
+            "techniques": [
+                "T1562"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "2b8cecfe-f705-432d-9f38-08207b9473e1",
+            "displayName": "IAM assume role policy brute force",
+            "description": "Several failed \"assume role\" attempts occurred on existing roles in the account. This could be an attacker trying to escalate privileges and move laterally by assuming roles in a compromised account. Verify with the user identity that the activity is legitimate.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where EventName == \"AssumeRole\" and ErrorMessage == \"AccessDenied\"| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName| summarize timestamp=arg_max(timestamp,*), failed_roles=dcount(ErrorMessage) by IPCustomEntity, AccountCustomEntity| where failed_roles > 2",
+            "tactics": [
+                "Credential Access"
+            ],
+            "techniques": [
+                "T1110"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "b5b172b1-d976-4113-af1f-02f7bf7d2092",
+            "displayName": "ECR image scan findings low",
+            "description": "AWS ECR Image scan detected low severity vulnerabilities in your container image.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where EventName == \"DescribeImageScanFindings\" and isempty(ErrorCode) and isempty(ErrorMessage)| extend repoName = tostring(parse_json(ResponseElements).repositoryName)| extend imageId = tostring(parse_json(ResponseElements).imageId.imageDigest)| extend Low = toint(parse_json(ResponseElements).imageScanFindings.findingSeverityCounts.LOW)| where Low > 0| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Execution"
+            ],
+            "techniques": [
+                "T1204"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "4e3c81bf-61a4-47f4-b20d-a5a414ea08aa",
+            "displayName": "CreateLoginProfile detected",
+            "description": "An attacker could use CreateLoginProfile permissions on other users for privilege escalation by creating a password to a victim user without a login profile to use to login to the AWS Console.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail  | where  EventName == \"CreateLoginProfile\" and isempty(ErrorCode) and isempty(ErrorMessage)  | project TimeGenerated, EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, UserIdentityArn,   UserIdentityUserName, SessionMfaAuthenticated, SourceIpAddress, AWSRegion, EventSource, AdditionalEventData, ResponseElements, RequestParameters  | extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))  | extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Persistence"
+            ],
+            "techniques": [
+                "T1098"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "e0a67cd7-b4e5-4468-aae0-26cb16a1bbd2",
+            "displayName": "Changes made to AWS IAM policy",
+            "description": "This query looks for when an API call is made to change an IAM, particularly those related to new policies beingattached to users and roles, as well as changes to access methods and changes to account level policies.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where  EventName in~ (\"AttachGroupPolicy\", \"AttachRolePolicy\", \"AttachUserPolicy\", \"CreatePolicy\",\"DeleteGroupPolicy\", \"DeletePolicy\", \"DeleteRolePolicy\", \"DeleteUserPolicy\", \"DetachGroupPolicy\",\"PutUserPolicy\", \"PutGroupPolicy\", \"CreatePolicyVersion\", \"DeletePolicyVersion\", \"DetachRolePolicy\", \"CreatePolicy\")| project TimeGenerated, EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, UserIdentityUserName, SessionMfaAuthenticated, SourceIpAddress, AWSRegion, EventSource, AdditionalEventData, ResponseElements| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityAccountId",
+            "tactics": [
+                "Privilege Escalation,Defense Evasion"
+            ],
+            "techniques": [
+                "T1078,T1484"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "c9ccaebf-314c-446d-b3f6-314560ccb0e1",
+            "displayName": "Excessive execution of discovery events",
+            "description": "Several enumeration API calls were executed by the same identity. This could be an attacker trying to enumerate the compromised user/token permissions. Verify with the user identity that this activity is legitimate.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where (EventName startswith \"List\" or EventName startswith \"Describe\" or EventName startswith \"Get\")| where SourceIpAddress !has \"amazonaws.com\" and UserAgent has \"aws-cli\"| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName| summarize timestamp=arg_max(timestamp,*), enum_events=dcount(EventName), num_regions=dcount(AWSRegion) by bin(TimeGenerated,24h), IPCustomEntity, AccountCustomEntity| where enum_events > 3",
+            "tactics": [
+                "Discovery"
+            ],
+            "techniques": [
+                "T1526"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "70c36558-e6d8-48b4-98b3-185d555cd5af",
+            "displayName": "Risky role name created",
+            "description": "Detections of risky role names could indicate that a malicious framework was executed in your environment.",
+            "kind": "HuntingQuery",
+            "query": "let PacuRoleNames = (externaldata (RoleName:string)[h@'https://raw.githubusercontent.com/RhinoSecurityLabs/pacu/master/pacu/modules/iam__enum_roles/default-word-list.txt']);AWSCloudTrail| where EventName == \"CreateRole\" and isempty(ErrorCode) and isempty(ErrorMessage)| extend roleName = parse_json(tostring((parse_json(RequestParameters)))).roleName| where roleName in (PacuRoleNames)| distinct TimeGenerated, EventName, SourceIpAddress, UserIdentityArn, UserIdentityUserName, tostring(roleName), UserIdentityAccountId, AWSRegion| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| summarize EventCount = count(), StartTime = min(TimeGenerated), EndTime = max(TimeGenerated), EventNameList=make_set(EventName), IPList=make_set(SourceIpAddress) by UserIdentityAccountId, AWSRegion, UserIdentityUserName, TimeGenerated, SourceIpAddress| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Persistence"
+            ],
+            "techniques": [
+                "T1098"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "d022a62c-643b-4e8a-b583-0230e32a96e4",
+            "displayName": "Changes made to AWS IAM objects",
+            "description": "Identity and Access Management (IAM) securely manages access to AWS services and resources.This query looks for when an API call is made to change an IAM, particularly those related to new objects being created or deleted. If these turn out to be noisy, filter out the most common for your environment.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail | where  EventName in~ (\"DeleteUser\", \"DeleteGroup\", \"CreateUser\") and isempty(ErrorMessage) and isempty(ErrorCode) | project TimeGenerated, EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent,    UserIdentityUserName, SessionMfaAuthenticated, SourceIpAddress, AWSRegion, EventSource, AdditionalEventData, ResponseElements | extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityAccountId",
+            "tactics": [
+                "Privilege Escalation,Defense Evasion"
+            ],
+            "techniques": [
+                "T1078,T1484"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "4fbbae0a-ce5b-4b2a-b5e6-700920561680",
+            "displayName": "ECR image scan findings medium",
+            "description": "AWS ECR image scan detected medium severity vulnerabilities in your container image.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where EventName == \"DescribeImageScanFindings\" and isempty(ErrorCode) and isempty(ErrorMessage)| extend repoName = tostring(parse_json(ResponseElements).repositoryName)| extend imageId = tostring(parse_json(ResponseElements).imageId.imageDigest)| extend Medium = toint(parse_json(ResponseElements).imageScanFindings.findingSeverityCounts.MEDIUM)| where Medium > 0| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName ",
+            "tactics": [
+                "Execution"
+            ],
+            "techniques": [
+                "T1204"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "67af1633-311f-4a94-bc8f-f904a54637b2",
+            "displayName": "Suspicious activity of STS token related to ECS",
+            "description": "Suspicious activity of the STS token of an EC2 machine hosted by ECS (for example, by SSRF) indicates a possible token hijacking. An attacker may have stolen the token and could abuse its permissions to escalate privileges and move laterally in the cloud account.",
+            "kind": "HuntingQuery",
+            "query": "let aws_public_ips = externaldata(prefixes: string)[     h@'https://aka.ms/awspublicipaddresse/aws-public-ip-addresses/ip-ranges.json']with(format='multijson');let timeframe = 30m;let lookback = 12h;//Get the AccessKey in the STS token (IMDS) when EC2 service assumes the Role periodicallylet sts_token = AWSCloudTrail| where TimeGenerated >= ago (lookback)| where EventSource == \"sts.amazonaws.com\" and SourceIpAddress == \"ec2.amazonaws.com\"| extend instanceId = tostring(parse_json(RequestParameters).roleSessionName)| extend token = tostring(parse_json(ResponseElements).credentials.accessKeyId);//Identify if the EC2 belongs to ECS/EKSlet typeOfEC2 = AWSCloudTrail| where TimeGenerated >= ago (lookback)| extend instanceId = tostring(split(UserIdentityPrincipalid, \":\")[1])| join sts_token on instanceId| where UserAgent startswith \"Amazon ECS Agent\"| project-away SourceIpAddress1, UserIdentityUserName1, UserIdentityArn1, TimeGenerated1;//Get the identities who used that STS token - this can be the EC2 which assumed it (legit),//but it can also be an external identity (attacker) which abuses the token permissions let tokenUsage = AWSCloudTrail| where TimeGenerated >= ago (timeframe)| join kind=inner typeOfEC2 on $left.UserIdentityAccessKeyId == $right.token| extend region = AWSRegion| project-away SourceIpAddress1, UserIdentityUserName1, UserIdentityArn1, TimeGenerated1;//Check whether the called identity is legitaws_public_ips| mv-expand todynamic(prefixes)| extend ip_prefix=tostring(todynamic(prefixes.['ip_prefix']))| extend region=tostring(todynamic(prefixes.['region']))| extend service=tostring(todynamic(prefixes.['service']))| project-away prefixes| where service == \"EC2\" | join kind=inner tokenUsage on region| where SourceIpAddress !contains \"amazonaws.com\"| where ipv4_is_private(SourceIpAddress) == false| extend IsInRange = ipv4_is_in_range(SourceIpAddress, ip_prefix)| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName, AssumedRoleArn = UserIdentityArn| summarize timestamp=arg_max(timestamp,*), r = make_set(IsInRange) by SourceIpAddress, UserIdentityUserName, UserIdentityArn| where not (set_has_element(r, true))| project-away ip_prefix, IsInRange",
+            "tactics": [
+                "Credential Access"
+            ],
+            "techniques": [
+                "T1528"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "6eb59239-78c5-401d-acfa-5cb9b3d31cd4",
+            "displayName": "S3 bucket encryption modified",
+            "description": "Detected modification of bucket encryption. An attacker could modify encryption of existing buckets for denial of service attacks.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where EventName in (\"PutBucketEncryption\",\"DeleteBucketEncryption\") and isempty(ErrorCode) and isempty(ErrorMessage)| extend encryptionConfig = tostring(parse_json(RequestParameters).ServerSideEncryptionConfiguration.Rule)| where encryptionConfig contains RecipientAccountId| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Impact"
+            ],
+            "techniques": [
+                "T1486"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "e0d57543-acbd-428b-bb96-24a67506f84d",
+            "displayName": "Unused or Unsupported Cloud Regions",
+            "description": "Adversaries may create cloud instances in unused geographic service regions in order to evade detection.Access is usually obtained through compromising accounts used to manage cloud infrastructure.Refer: https://attack.mitre.org/techniques/T1535/",
+            "kind": "HuntingQuery",
+            "query": "let starttime = todatetime('{{StartTimeISO}}');let endtime = todatetime('{{EndTimeISO}}');let lookback = starttime - 14d;// Generating historical table of all events per AccountId and Regionlet EventInfo_CurrentDay =  materialize (AWSCloudTrail | where TimeGenerated between(starttime..endtime));let EventInfo_historical = AWSCloudTrail  | where TimeGenerated  between (lookback..starttime) | summarize max(TimeGenerated) by AWSRegion, UserIdentityAccountId;// Doing Leftanti join to find new regions historically not seen for the same account.let EventInfo_Unseen = materialize (EventInfo_CurrentDay| summarize max(TimeGenerated) by AWSRegion, UserIdentityAccountId| join kind= leftanti(  EventInfo_historical) on AWSRegion, UserIdentityAccountId);EventInfo_Unseen// Join Ununsed region seen with current data to gather context about API events seen| join kind= inner (   EventInfo_CurrentDay) on AWSRegion, UserIdentityAccountId| extend UnusedRegion = AWSRegion| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| summarize EventCount = count(), StartTime = min(TimeGenerated), EndTime = max(TimeGenerated), EventNameList=make_set(EventName), IPList=make_set(SourceIpAddress) by UserIdentityAccountId, UnusedRegion, UserIdentityUserName| extend timestamp = StartTime , AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Defense Evasion"
+            ],
+            "techniques": [
+                "T1535"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "0cd3eb95-6c8e-4eeb-8338-a0decdc0a328",
+            "displayName": "Suspicious activity of STS token related to Glue",
+            "description": "Suspicious activity of the STS token of a Glue endpoint machine hosted by ECS (for example, by SSRF) indicates a possible token hijacking. An attacker may have stolen the token and could abuse its permissions to escalate privileges and move laterally in the cloud account.",
+            "kind": "HuntingQuery",
+            "query": "let aws_public_ips = externaldata(prefixes: string)[      h@'https://aka.ms/awspublicipaddresse/aws-public-ip-addresses/ip-ranges.json']with(format='multijson');let timeframe = 30m;let lookback = 12h;//Get the AccessKey in the STS token when Lambda service assumes the Role periodically (max assumed session can be 12h)let sts_token = AWSCloudTrail| where TimeGenerated >= ago (lookback)| where EventSource == \"sts.amazonaws.com\" and SourceIpAddress == \"glue.amazonaws.com\"| extend instanceId = tostring(parse_json(RequestParameters).roleSessionName)| extend token = tostring(parse_json(ResponseElements).credentials.accessKeyId);//Get the identities who used that STS token - this can be the Lambda function itself which assumed it (legit),//but it can also be an external identity which abuses the token permissionslet tokenUsage = AWSCloudTrail| where TimeGenerated >= ago (timeframe)| join kind=inner sts_token on $left.UserIdentityAccessKeyId == $right.token| extend region = AWSRegion1| project-away SourceIpAddress1, UserIdentityUserName1, UserIdentityArn1, TimeGenerated1;//Check whether the called identity is legitaws_public_ips| mv-expand todynamic(prefixes)| extend ip_prefix=tostring(todynamic(prefixes.['ip_prefix']))| extend region=tostring(todynamic(prefixes.['region']))| extend service=tostring(todynamic(prefixes.['service']))| project-away prefixes| where service == \"AMAZON\" | join kind=inner tokenUsage on region| where SourceIpAddress !contains \"amazonaws.com\"| where ipv4_is_private(SourceIpAddress) == false| extend IsInRange = ipv4_is_in_range(SourceIpAddress, ip_prefix)| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName, AssumedRoleArn = UserIdentityArn| summarize timestamp=arg_max(timestamp,*), r = make_set(IsInRange) by SourceIpAddress, UserIdentityUserName, UserIdentityArn| where not (set_has_element(r, true))| project-away ip_prefix, IsInRange",
+            "tactics": [
+                "Credential Access"
+            ],
+            "techniques": [
+                "T1528"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "356aa5a8-fa6f-4eb9-baa9-ffcf725e3e82",
+            "displayName": "S3 bucket has been deleted",
+            "description": "Detected deletion of a S3 bucket. An attacker could delete S3 objects for impact and Denail of service purposes.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where  EventName == \"DeleteBucket\" and isempty(ErrorCode) and isempty(ErrorMessage)| project TimeGenerated, EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, UserIdentityUserName, UserIdentityArn, SessionMfaAuthenticated, SourceIpAddress, AWSRegion, EventSource, AdditionalEventData, ResponseElements, BucketName=tostring(parse_json(RequestParameters).bucketName)| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = BucketName",
+            "tactics": [
+                "Impact"
+            ],
+            "techniques": [
+                "T1485"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "0db42a94-e7c8-4bf1-99a7-1a2fb4158212",
+            "displayName": "Privileged role attached to Instance",
+            "description": "Identity and Access Management (IAM) securely manages access to AWS services and resources.Identifies when a Privileged role is attached to an existing instance or new instance at deployment. This instance may be used by an adversary to escalate a normal user privileges to an adminsitrative level.and AWS API AddRoleToInstanceProfile at https://docs.aws.amazon.com/IAM/latest/APIReference/API_AddRoleToInstanceProfile.html ",
+            "kind": "HuntingQuery",
+            "query": "let EventNameList = dynamic([\"AttachUserPolicy\",\"AttachRolePolicy\",\"AttachGroupPolicy\"]);let PolicyArnList = dynamic([\"arn:aws:iam::aws:policy/AdministratorAccess\",\"arn:aws:iam::aws:policy/DatabaseAdministrator\",\"arn:aws:iam::aws:policy/NetworkAdministrator\",\"arn:aws:iam::aws:policy/SystemAdministrator\",\"arn:aws:iam::aws:policy/AmazonS3FullAccess\"]);let starttime = todatetime('{{StartTimeISO}}');let endtime = todatetime('{{EndTimeISO}}');let lookback = starttime - 14d;//Creating a temp table of events creating privileged role or users which can later be correlated with suspicious operations.let PrivilegedRoleorUsers = AWSCloudTrail| where TimeGenerated >= lookback | where EventName in (EventNameList)| extend PolicyArn = tostring(parse_json(RequestParameters).policyArn), RoleName = tostring(parse_json(RequestParameters).roleName)| where PolicyArn in (PolicyArnList)| distinct PolicyArn, UserIdentityType, UserIdentityUserName,RoleName;// Joining the list of identities having Privileged roles with the API call AddRoleToInstanceProfile to indentify the instances which may be used by adversaries as pivot point for privilege escalation.PrivilegedRoleorUsers| join (AWSCloudTrail| where TimeGenerated between (starttime..endtime)| where EventName in (\"AddRoleToInstanceProfile\") | extend InstanceProfileName = tostring(parse_json(RequestParameters).InstanceProfileName), RoleName = tostring(parse_json(RequestParameters).roleName)| summarize EventCount=count(), StartTimeUtc = min(TimeGenerated), EndTimeUtc = max(TimeGenerated) by EventSource, EventName, UserIdentityType , UserIdentityArn , UserIdentityUserName, SourceIpAddress, RoleName) on RoleName | extend timestamp = StartTimeUtc, IPCustomEntity = SourceIpAddress, AccountCustomEntity = RoleName",
+            "tactics": [
+                "Privilege Escalation"
+            ],
+            "techniques": [
+                "T1098"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "48c49b1d-2aa0-442b-96e3-cae6ad1251cd",
+            "displayName": "Bucket versioning suspended",
+            "description": "Detected Bucket versioning suspended event. Attackers could use this technique to be able to ransom buckets without the option for the victim to have a backup.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where EventName == \"PutBucketVersioning\" and isempty(ErrorCode) and isempty(ErrorMessage)| extend status = tostring(parse_json(RequestParameters).VersioningConfiguration.Status)| where status == \"Suspended\"| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Impact"
+            ],
+            "techniques": [
+                "T1485"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "a2772445-9bb1-4176-9481-b262cb59118a",
+            "displayName": "New access key created to user",
+            "description": "An attacker with the CreateAccessKey permissions on other users can create an access Key ID and secret access key belonging to another user in the AWS environment for privilege escalation.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where  EventName == \"CreateAccessKey\" and isempty(ErrorCode) and isempty(ErrorMessage)| project TimeGenerated, EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, UserIdentityUserName, SessionMfaAuthenticated, SourceIpAddress, AWSRegion, EventSource, AdditionalEventData,UserIdentityArn, ResponseElements, RequestParameters| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Persistence"
+            ],
+            "techniques": [
+                "T1098"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "a3a19731-9e82-49b6-9142-2dd570feefd5",
+            "displayName": "Modification of vpc attributes",
+            "description": "An attacker could modify vpc attributesin order to access resources he couldn't access before.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where  EventName == \"ModifyVpcAttribute\" and isempty(ErrorCode) and isempty(ErrorMessage)| project TimeGenerated, EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, UserIdentityUserName, SessionMfaAuthenticated, SourceIpAddress, AWSRegion, EventSource, UserIdentityArn, AdditionalEventData, ResponseElements| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Defense Evasion"
+            ],
+            "techniques": [
+                "T1562"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "49bae199-ea04-4a2e-95a6-e3a1f68ab259",
+            "displayName": "Network ACL deleted",
+            "description": "An attacker could delete a network ACL and gain access to an instance from anywhere. Verify this action with the entity.",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where EventName == 'DeleteNetworkAclEntry' and isempty(ErrorMessage) and isempty(ErrorCode)| extend egress=parse_json(RequestParameters)['egress']| where egress == false| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Defense Evasion"
+            ],
+            "techniques": [
+                "T1562"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "838f59d4-fe47-422b-819d-1be502940547",
+            "displayName": "Login profile updated",
+            "description": "An attacker could use UpdateLoginProfile permissions for privilege escalation by changing the victim user password. More about this API at https://docs.aws.amazon.com/IAM/latest/APIReference/API_UpdateLoginProfile.html ",
+            "kind": "HuntingQuery",
+            "query": "AWSCloudTrail| where  EventName == \"UpdateLoginProfile\" and isempty(ErrorCode) and isempty(ErrorMessage)| project TimeGenerated, EventName, EventTypeName, UserIdentityAccountId, UserIdentityPrincipalid, UserAgent, UserIdentityUserName, SessionMfaAuthenticated, SourceIpAddress, AWSRegion, EventSource,UserIdentityArn, AdditionalEventData, ResponseElements, RequestParameters| extend UserIdentityUserName = iff(isnotempty(UserIdentityUserName), UserIdentityUserName, tostring(split(UserIdentityArn,'/')[-1]))| extend timestamp = TimeGenerated, IPCustomEntity = SourceIpAddress, AccountCustomEntity = UserIdentityUserName",
+            "tactics": [
+                "Persistence"
+            ],
+            "techniques": [
+                "T1098"
+            ],
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
         }
     ]
 }

@@ -1,17 +1,30 @@
 {
     "workbook": [
         {
-            "searchKey": "CiscoUmbrellaWorkbook",
-            "displayName": "Cisco Umbrella",
-            "description": "Gain insights into Cisco Umbrella activities, including the DNS, Proxy and Cloud Firewall data. Workbook shows general information along with threat landscape including categories, blocked destinations and URLs.",
+            "searchKey": "AmazonWebServicesUserActivitiesWorkbook",
+            "displayName": "AWS User Activities",
+            "description": "Gain insights into AWS user activities, including failed sign-in attempts, IP addresses, regions, user agents, and identity types, as well as potential malicious user activities with assumed roles.",
             "kind": "Workbook",
-            "dataTypes": "Cisco_Umbrella_dns_CL --Cisco_Umbrella_proxy_CL --Cisco_Umbrella_ip_CL --Cisco_Umbrella_cloudfirewall_CL --",
-            "dataConnectorId": "CiscoUmbrellaDataConnector",
+            "dataTypes": "AWSCloudTrail --",
+            "dataConnectorId": "AWS",
             "version": "1.0.0",
-            "source": "CiscoUmbrella",
+            "source": "Amazon Web Services",
             "author": "Microsoft",
             "support": "Microsoft Corporation",
-            "solutionSearchName": "Cisco Umbrella"
+            "solutionSearchName": "Amazon Web Services"
+        },
+        {
+            "searchKey": "AmazonWebServicesNetworkActivitiesWorkbook",
+            "displayName": "AWS Network Activities",
+            "description": "Gain insights into AWS network related resource activities, including the creation, update, and deletions of security groups, network ACLs and routes, gateways, elastic load balancers, VPCs, subnets, and network interfaces.",
+            "kind": "Workbook",
+            "dataTypes": "AWSCloudTrail --",
+            "dataConnectorId": "AWS",
+            "version": "1.0.0",
+            "source": "Amazon Web Services",
+            "author": "Microsoft",
+            "support": "Microsoft Corporation",
+            "solutionSearchName": "Amazon Web Services"
         }
     ]
 }
