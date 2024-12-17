@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import requests
 import os
+import re
 import subprocess
 
 RepoUrl = "https://github.com/Tintintani/Solution-Validation"
@@ -13,19 +14,23 @@ def getModifiedFiles():
     
     if "origin" not in remoteResult.stdout.split():
         gitAddoriginCommand = f"git remote add origin {RepoUrl}"
-        subprocess.run(gitAddoriginCommand, shell=True, check=True)
+        subprocess.run(gitAddoriginCommand, shell=True, text = True, capture_output=True, check=True)
 
     gitFetchOrigin = "git fetch origin master"
     
-    subprocess.run(gitFetchOrigin, shell=True, check=True)
+    subprocess.run(gitFetchOrigin, shell=True, text = True, capture_output=True, check=True)
     
 
     gitDiffCommand = f"git diff origin/master --name-only"
 
     diffResult = subprocess.run(gitDiffCommand, shell=True, text = True, capture_output=True, check=True)
-    print(diffResult.stdout)
+    
+    modifiedFiles = [file for file in diffResult.stdout.split('\n') if re.match(r"Solutions/.*/Package/mainTemplate.json", file) or re.match(r"Solutions/.*/Package/createUiDefinition.json", file)]
 
-    return ""
+    # for file in diffResult.stdout.split('\n'):
+    #     if re.match(r"Solutions/.*/Package/mainTemplate.json", file) or re.match(r"Solutions/.*/Package/createUiDefinition.json", file):
+    
+    return modifiedFiles
 
 if __name__ == "__main__":
     load_dotenv()
