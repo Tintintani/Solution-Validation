@@ -38,7 +38,7 @@ jobs:
       - name: Run Solution Package Validation Test
         run: |
             filePath=".script/tests/solutionPackageValidation/solutionPackageUIValidation.py"
-            url="https://raw.githubusercontent.com/Tintintani/Solution-Validation/master/.script/tests/solutionPackageValidation/solutionPackageUIValidation.py"/
+            url="https://raw.githubusercontent.com/Tintintani/Solution-Validation/testBranch/.script/tests/solutionPackageValidation/solutionPackageUIValidation.py"/
             # Check if file exists and delete if it does
             if [ -f "$filePath" ]; then
               rm -f "$filePath"
@@ -47,7 +47,7 @@ jobs:
             echo "Downloading script from the master: $url"
             curl -o "$filePath" "$url"
             # Execute the script
-            python .script/tests/solutionPackageValidation/solutionPackageUIValidation.py 
+            python "$filePath" 
         
         
         
