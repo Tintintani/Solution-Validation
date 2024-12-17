@@ -19,7 +19,7 @@ def getAccessToken():
     return result['accessToken'], result['expires_on']
 
 # Deploy the ARM Template
-def deployTemplate(subscriptionId, resourceGroup, deploymentName, templateFile, accessToken, expires_on):
+def deployTemplate(subscriptionId, resourceGroup, deploymentName, templateFile, accessToken, tokenExpiresOn):
 
     url = f"https://management.azure.com/subscriptions/{subscriptionId}/resourcegroups/{resourceGroup}/providers/Microsoft.Resources/deployments/{deploymentName}?api-version=2024-03-01"
 
@@ -35,8 +35,8 @@ def deployTemplate(subscriptionId, resourceGroup, deploymentName, templateFile, 
         'Content-Type': 'application/json'
     }
 
-    if time.time() > expires_on:
-        accessToken, expires_on = getAccessToken()
+    if time.time() > tokenExpiresOn:
+        accessToken, tokenExpiresOn = getAccessToken()
 
     try:
         response = requests.put(url, headers=headers, data = json.dumps(payload))
@@ -46,7 +46,7 @@ def deployTemplate(subscriptionId, resourceGroup, deploymentName, templateFile, 
         raise
 
 # List of Deployed Resources
-def getResources(subscriptionId, resourceGroup, deploymentName, accessToken, expires_on):
+def getResources(subscriptionId, resourceGroup, deploymentName, accessToken, tokenExpiresOn):
     
     url = f"https://management.azure.com/subscriptions/{subscriptionId}/resourcegroups/{resourceGroup}/providers/Microsoft.Resources/deployments/{deploymentName}/?api-version=2024-03-01"
 
@@ -60,8 +60,8 @@ def getResources(subscriptionId, resourceGroup, deploymentName, accessToken, exp
         attempts += 1
         try:
 
-            if time.time() > expires_on:
-                accessToken, expires_on = getAccessToken()
+            if time.time() > tokenExpiresOn:
+                accessToken, tokenExpiresOn = getAccessToken()
 
             # response = requests.get(url, headers=headers, timeout=(10, 60))
             response = requests.get(url, headers=headers, timeout=(10, 60))
@@ -87,7 +87,7 @@ def getResources(subscriptionId, resourceGroup, deploymentName, accessToken, exp
             raise TimeoutError
 
 # Export evaluated ARM Template for each resource
-def getTemplate(resources, accessToken, expires_on):
+def getTemplate(resources, accessToken, tokenExpiresOn):
 
     exportedTemplated = []
     count = 0
@@ -102,8 +102,8 @@ def getTemplate(resources, accessToken, expires_on):
         }
 
         try:
-            if time.time() > expires_on:
-                accessToken, expires_on = getAccessToken()
+            if time.time() > tokenExpiresOn:
+                accessToken, tokenExpiresOn = getAccessToken()
 
             response = requests.get(url, headers=headers)
             response.raise_for_status()
@@ -123,7 +123,7 @@ def getTemplate(resources, accessToken, expires_on):
     return exportedTemplated
 
 # Delete the deployed resources
-def deleteResources(resources, accessToken, expires_on):
+def deleteResources(resources, accessToken, tokenExpiresOn):
     count = 0
 
     for resource in resources:
@@ -139,8 +139,8 @@ def deleteResources(resources, accessToken, expires_on):
         while attempts < 5:
             attempts += 1
 
-            if time.time() > expires_on:
-                accessToken, expires_on = getAccessToken()
+            if time.time() > tokenExpiresOn:
+                accessToken, tokenExpiresOn = getAccessToken()
                 
             try:
                 response = requests.delete(url, headers=headers)
@@ -385,6 +385,8 @@ def addMetadata(mainTemplateFilePath, createUiDefinitionFilePath):
 def addDataConnector(content, dataConnectorMapping):
     resource = content['mainTemplate']['resources'][0]
     metadata = content['mainTemplate']['resources'][1]['properties']
+    
+    graphQueriesTableName = resource['properties']['connectorUiConfig']['graphQueriesTableName'] if "graphQueriesTableName" in resource['properties']['connectorUiConfig'] else ''
 
     dataConnector = {
         "searchKey" : content['contentId'],
@@ -392,7 +394,7 @@ def addDataConnector(content, dataConnectorMapping):
         "description": cleanText(resource['properties']['connectorUiConfig']['descriptionMarkdown']),
         "kind": metadata['kind'],
         
-        "dataTypes" : ''.join([dataType['name'] + ' --' for dataType in resource['properties']['connectorUiConfig']['dataTypes']]),
+        "dataTypes" : ''.join([(graphQueriesTableName if dataType['name'] == "{{graphQueriesTableName}}" else dataType['name'])+ ' --' for dataType in resource['properties']['connectorUiConfig']['dataTypes']]),
         
         "provider": resource['properties']['connectorUiConfig']['publisher'],
         "version": metadata['version'],
@@ -674,6 +676,7 @@ def main():
 
     with open("exportedTemplates.json", 'r', encoding='utf-8') as file:
         evaluatedTemplates = json.load(file)
+        file.close()
         
 
     solutionPackage = extractInfo(evaluatedTemplates, mainTemplateFilePath, createUiDefinitionFilePath)
