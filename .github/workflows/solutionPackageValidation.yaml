@@ -37,7 +37,7 @@ jobs:
             pip install requests
       - name: Run Solution Package Validation Test
         run: |
-            filePath = ".script/tests/solutionPackageValidation/solutionPackageUIValidatoin.py"
+            filePath = ".script/tests/solutionPackageValidation/solutionPackageUIValidation.py"
             url = "https://raw.githubusercontent.com/Tintintani/Solution-Validation/master/.script/tests/solutionPackageValidation/solutionPackageUIValidation.py"/
             # Check if file exists and delete if it does
             if [ -f "$filePath" ]; then
