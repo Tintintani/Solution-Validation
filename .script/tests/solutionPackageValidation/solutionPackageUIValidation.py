@@ -25,7 +25,7 @@ def getModifiedFiles(currentDirectory):
     except subprocess.CalledProcessError as e:
         print(e)
 
-    gitDiffCommand = f"git diff origin/master {currentDirectory} --name-only"
+    gitDiffCommand = f"git diff origin/master {currentDirectory}/../../../Solutions/ --name-only"
 
     diffResult = subprocess.run(gitDiffCommand, shell=True, text = True, capture_output=True, check=True)
     print(diffResult.stdout)
