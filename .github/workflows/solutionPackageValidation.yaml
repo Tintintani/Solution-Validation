@@ -47,7 +47,7 @@ jobs:
             echo "Downloading script from the master: $url"
             curl -o "$filePath" "$url"
             # Execute the script
-            python "$filePath" 
+            python ".script/tests/solutionPackageValidation/solutionPackageUIValidation.py" 
         
         
         
