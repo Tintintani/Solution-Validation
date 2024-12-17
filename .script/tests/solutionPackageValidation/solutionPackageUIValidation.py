@@ -5,11 +5,9 @@ import subprocess
 
 RepoUrl = "https://github.com/Tintintani/Solution-Validation"
 def main():
-    currentDirectory = os.path.dirname(os.path.abspath(__file__))
-    modifiedFiles = getModifiedFiles(currentDirectory)
-    print(modifiedFiles)
+    modifiedFiles = getModifiedFiles()
 
-def getModifiedFiles(currentDirectory):
+def getModifiedFiles():
     gitRemoteCommand = "git remote"
     remoteResult = subprocess.run(gitRemoteCommand, shell=True, text = True, capture_output=True, check=True)
     
@@ -19,17 +17,15 @@ def getModifiedFiles(currentDirectory):
 
     gitFetchOrigin = "git fetch origin master"
     
-    try:
-        subprocess.check_output(gitFetchOrigin, shell=True).decode().split("\n")
-    except subprocess.CalledProcessError as e:
-        print(f"hello {e}")
+    subprocess.run(gitFetchOrigin, shell=True, check=True)
+    
 
     gitDiffCommand = f"git diff origin/master --name-only"
 
     diffResult = subprocess.run(gitDiffCommand, shell=True, text = True, capture_output=True, check=True)
     print(diffResult.stdout)
 
-    return "f"
+    return ""
 
 if __name__ == "__main__":
     load_dotenv()
