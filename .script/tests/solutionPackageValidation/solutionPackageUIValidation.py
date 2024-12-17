@@ -7,6 +7,7 @@ import subprocess
 RepoUrl = "https://github.com/Tintintani/Solution-Validation"
 def main():
     modifiedFiles = getModifiedFiles()
+    print(modifiedFiles)
 
 def getModifiedFiles():
     gitRemoteCommand = "git remote"
