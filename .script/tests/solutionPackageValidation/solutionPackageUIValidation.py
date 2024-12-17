@@ -12,20 +12,19 @@ def main():
 def getModifiedFiles(currentDirectory):
     gitRemoteCommand = "git remote"
     remoteResult = subprocess.run(gitRemoteCommand, shell=True, text = True, capture_output=True, check=True)
-    print(remoteResult.stdout)
     
     if "origin" not in remoteResult.stdout.split():
         gitAddoriginCommand = f"git remote add origin {RepoUrl}"
         subprocess.run(gitAddoriginCommand, shell=True, check=True)
 
-    gitFetchOrigin = "git fetch origin"
+    gitFetchOrigin = "git fetch origin master"
     
     try:
         subprocess.check_output(gitFetchOrigin, shell=True).decode().split("\n")
     except subprocess.CalledProcessError as e:
-        print(e)
+        print(f"hello {e}")
 
-    gitDiffCommand = f"git diff origin/master {currentDirectory}/../../../Solutions/ --name-only"
+    gitDiffCommand = f"git diff origin/master --name-only"
 
     diffResult = subprocess.run(gitDiffCommand, shell=True, text = True, capture_output=True, check=True)
     print(diffResult.stdout)
