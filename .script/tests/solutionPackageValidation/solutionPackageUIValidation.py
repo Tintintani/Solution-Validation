@@ -12,6 +12,7 @@ def main():
 def getModifiedFiles(currentDirectory):
     gitRemoteCommand = "git remote"
     remoteResult = subprocess.run(gitRemoteCommand, shell=True, text = True, capture_output=True, check=True)
+    print(remoteResult.stdout)
     
     if "origin" not in remoteResult.stdout.split():
         gitAddoriginCommand = f"git remote add origin {RepoUrl}"
