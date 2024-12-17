@@ -20,7 +20,7 @@ def getModifiedFiles(currentDirectory):
     gitFetchOrigin = "git fetch origin"
     
     try:
-        subprocess.check_output(gitFetchOrigin, shell=True, check=True)
+        subprocess.check_output(gitFetchOrigin, shell=True, text = True, capture_output=True, check=True)
     except subprocess.CalledProcessError as e:
         print(e.output)
 
