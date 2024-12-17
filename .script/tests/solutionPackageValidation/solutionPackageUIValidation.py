@@ -3,7 +3,7 @@ import requests
 import os
 import subprocess
 
-RepoUrl = "https://github.com/Tintintani/Solution-Validation.git"
+RepoUrl = "https://github.com/Tintintani/Solution-Validation"
 def main():
     currentDirectory = os.path.dirname(os.path.abspath(__file__))
     modifiedFiles = getModifiedFiles(currentDirectory)
@@ -13,7 +13,7 @@ def getModifiedFiles(currentDirectory):
     gitRemoteCommand = "git remote"
     remoteResult = subprocess.run(gitRemoteCommand, shell=True, text = True, capture_output=True, check=True)
     
-    if "master" not in remoteResult.stdout.split(' '):
+    if "origin" not in remoteResult.stdout.split():
         gitAddoriginCommand = f"git remote add origin {RepoUrl}"
         subprocess.run(gitAddoriginCommand, shell=True, check=True)
 
