@@ -18,7 +18,11 @@ def getModifiedFiles(currentDirectory):
         subprocess.run(gitAddoriginCommand, shell=True, check=True)
 
     gitFetchOrigin = "git fetch origin"
-    subprocess.run(gitFetchOrigin, shell=True, check=True)
+    
+    try:
+        subprocess.check_output(gitFetchOrigin, shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print(e.output)
 
     gitDiffCommand = f"git diff origin/master {currentDirectory} --name-only"
 
