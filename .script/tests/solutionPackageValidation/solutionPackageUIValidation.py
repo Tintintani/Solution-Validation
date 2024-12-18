@@ -22,7 +22,7 @@ def getModifiedFiles():
     subprocess.run(gitFetchOrigin, shell=True, text = True, capture_output=True, check=True)
     
 
-    gitDiffCommand = f"git diff origin/master --name-only"
+    gitDiffCommand = "git diff origin/master ${{github.event.pull_request.head.sha}} --name-only"
 
     diffResult = subprocess.run(gitDiffCommand, shell=True, text = True, capture_output=True, check=True)
     
