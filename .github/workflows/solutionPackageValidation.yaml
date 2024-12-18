@@ -11,7 +11,7 @@ on:
     # Allows to run workflow manually from the Actions tab
     workflow_dispatch:
 jobs:
-  Run-SolutionPackage-Validation:
+  Run-ExtractContent:
     name: Solution Package UI Testing - Testim.io
     runs-on: ubuntu-latest
     steps:

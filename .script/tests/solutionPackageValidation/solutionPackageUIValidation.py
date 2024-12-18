@@ -7,7 +7,10 @@ import subprocess
 RepoUrl = "https://github.com/Tintintani/Solution-Validation"
 def main():
     modifiedFiles = getModifiedFiles()
-    print(modifiedFiles)
+    with open("modifiedFiles.txt", "w") as file:
+        for modifiedFile in modifiedFiles:
+            file.write(modifiedFile + "\n")
+        file.close()
 
 def getModifiedFiles():
     gitRemoteCommand = "git remote"
@@ -22,7 +25,7 @@ def getModifiedFiles():
     subprocess.run(gitFetchOrigin, shell=True, text = True, capture_output=True, check=True)
     
 
-    gitDiffCommand = "git diff origin/master ${{github.event.pull_request.head.sha}} --name-only"
+    gitDiffCommand = "git diff origin/master --name-only"
 
     diffResult = subprocess.run(gitDiffCommand, shell=True, text = True, capture_output=True, check=True)
     
