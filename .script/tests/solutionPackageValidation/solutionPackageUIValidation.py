@@ -692,6 +692,8 @@ def main():
     load_dotenv()
 
     modifiedFiles = getModifiedFiles()
+    
+    print(os.environ.get("SUBSCRIPTION_ID"))
 
     mainTemplateFilePath = ""
     createUiDefinitionFilePath = ""
