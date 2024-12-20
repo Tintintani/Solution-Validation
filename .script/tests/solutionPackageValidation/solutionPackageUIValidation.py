@@ -751,11 +751,11 @@ def main():
 
     if mainTemplateFilePath == "":
         createUiDefinitionFilePath = mainTemplateFilePath.replace("mainTemplate.json", "createUiDefinition.json")
-    if mainTemplateFilePath == "":
+    if createUiDefinitionFilePath == "":
         mainTemplateFilePath = createUiDefinitionFilePath.replace( "createUiDefinition.json", "mainTemplate.json")
     
     print(mainTemplateFilePath, createUiDefinitionFilePath)
-    
+
     with open(mainTemplateFilePath, 'r', encoding='utf-8') as file:
         mainTemplateFile = json.load(file)
         file.close()
