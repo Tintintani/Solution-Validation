@@ -43,6 +43,8 @@ jobs:
         run: |
             filePath=".script/tests/solutionPackageValidation/solutionPackageUIValidation.py"
             python $filePath
+      - name: Test Env
+        run: echo "$SUBSCRIPTION_ID"
         
         
         
