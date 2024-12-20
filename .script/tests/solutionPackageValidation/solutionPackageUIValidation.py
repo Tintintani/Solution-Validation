@@ -703,6 +703,7 @@ def writeFiles(solutionPackage):
     with open(".\\templates\\watchlists.json", 'w', encoding='utf-8') as file:
         json.dump(solutionPackage['Watchlists'], file, indent=4)
         file.close()
+
 # Get Modified Files
 def getModifiedFiles():
     gitRemoteCommand = "git remote"
@@ -734,8 +735,6 @@ def main():
 
     modifiedFiles = getModifiedFiles()
     
-    print(os.environ.get("SUBSCRIPTION_ID"))
-
     mainTemplateFilePath = ""
     createUiDefinitionFilePath = ""
 
@@ -749,9 +748,9 @@ def main():
     # mainTemplateFilePath = "D:\\Solution Validation\\mainTemplate.json"
     # createUiDefinitionFilePath = "D:\\Solution Validation\\createUiDefinition.json"
 
-    if mainTemplateFilePath == "":
-        createUiDefinitionFilePath = mainTemplateFilePath.replace("mainTemplate.json", "createUiDefinition.json")
     if createUiDefinitionFilePath == "":
+        createUiDefinitionFilePath = mainTemplateFilePath.replace("mainTemplate.json", "createUiDefinition.json")
+    if mainTemplateFilePath == "":
         mainTemplateFilePath = createUiDefinitionFilePath.replace( "createUiDefinition.json", "mainTemplate.json")
     
     print(mainTemplateFilePath, createUiDefinitionFilePath)
