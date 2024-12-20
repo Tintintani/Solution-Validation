@@ -3,14 +3,24 @@ import requests
 import os
 import re
 import subprocess
+import json
 
 RepoUrl = "https://github.com/Tintintani/Solution-Validation"
+
+# Azure Access Token
+def getAccessToken():
+    # Get an access token using Azure CLI
+    result = subprocess.run('az account get-access-token --output json', capture_output=True, shell=True)
+    result = json.loads(result.stdout)
+    return result['accessToken'], result['expires_on']
+
 def main():
     modifiedFiles = getModifiedFiles()
     with open("modifiedFiles.txt", "w") as file:
         for modifiedFile in modifiedFiles:
             file.write(modifiedFile + "\n")
         file.close()
+    print(getAccessToken())
 
 def getModifiedFiles():
     gitRemoteCommand = "git remote"
