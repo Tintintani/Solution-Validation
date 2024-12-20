@@ -47,6 +47,10 @@ jobs:
         run: |
             filePath=".script/tests/solutionPackageValidation/solutionPackageUIValidation.py"
             python $filePath
+      - name: Run Testim
+        run: |
+            filePath=".script/tests/solutionPackageValidation/runTests.py"
+            python $filePath
         
         
         

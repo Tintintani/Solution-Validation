@@ -744,36 +744,21 @@ def main():
         elif (file.endswith("createUiDefinition.json")):
             createUiDefinitionFilePath = file
 
-    
-    # mainTemplateFilePath = "D:\\Solution Validation\\mainTemplate.json"
-    # createUiDefinitionFilePath = "D:\\Solution Validation\\createUiDefinition.json"
-
     if createUiDefinitionFilePath == "":
         createUiDefinitionFilePath = mainTemplateFilePath.replace("mainTemplate.json", "createUiDefinition.json")
     if mainTemplateFilePath == "":
         mainTemplateFilePath = createUiDefinitionFilePath.replace( "createUiDefinition.json", "mainTemplate.json")
     
-    print(mainTemplateFilePath, createUiDefinitionFilePath)
-
     with open(mainTemplateFilePath, 'r', encoding='utf-8') as file:
         mainTemplateFile = json.load(file)
         file.close()
 
-    
     evaluatedTemplates = evaluateARMExpressions(mainTemplateFile)
-
-    # with open("exportedTemplates.json", 'r', encoding='utf-8') as file:
-    #     evaluatedTemplates = json.load(file)
-    #     file.close()
-        
 
     solutionPackage = extractInfo(evaluatedTemplates, mainTemplateFilePath, createUiDefinitionFilePath)
 
-    print(solutionPackage)
-
     writeFiles(solutionPackage)
     
-
 
 if __name__ == '__main__':
     main()
