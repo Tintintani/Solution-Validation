@@ -693,7 +693,7 @@ def main():
 
     modifiedFiles = getModifiedFiles()
     
-    print(os.environ.get("SUBSCRIPTION_ID"))
+    print(os.getenv("GITHUB_ENV"))
 
     mainTemplateFilePath = ""
     createUiDefinitionFilePath = ""
