@@ -662,6 +662,47 @@ def extractInfo(evaluatedTemplates, mainTemplateFilePath, createUiDefinitionFile
 
     return solutionPackage
 
+# Write the files
+def writeFiles(solutionPackage):
+    with open(".\\templates\\solution.json", 'w', encoding='utf-8') as file:
+        json.dump(solutionPackage, file, indent=4)
+        file.close()
+
+    with open(".\\templates\\metadata.json", 'w', encoding='utf-8') as file:
+        json.dump(solutionPackage['Metadata'], file, indent=4)
+        file.close()
+
+    with open(".\\templates\\dataConnectors.json", 'w', encoding='utf-8') as file:
+        json.dump(solutionPackage['DataConnectors'], file, indent=4)
+        file.close()
+
+    with open(".\\templates\\analyticsRules.json", 'w', encoding='utf-8') as file:
+        json.dump(solutionPackage['AnalyticsRules'], file, indent=4)
+        file.close()
+
+    with open(".\\templates\\huntingQueries.json", 'w', encoding='utf-8') as file:
+        json.dump(solutionPackage['HuntingQueries'], file, indent=4)
+        file.close()
+
+    with open(".\\templates\\workbooks.json", 'w', encoding='utf-8') as file:
+        json.dump(solutionPackage['Workbooks'], file, indent=4)
+        file.close()
+
+    with open(".\\templates\\parsers.json", 'w', encoding='utf-8') as file:
+        json.dump(solutionPackage['Parsers'], file, indent=4)
+        file.close()
+
+    with open(".\\templates\\playbooks.json", 'w', encoding='utf-8') as file:
+        json.dump(solutionPackage['Playbooks'], file, indent=4)
+        file.close()
+
+    with open(".\\templates\\logicApps.json", 'w', encoding='utf-8') as file:
+        json.dump(solutionPackage['LogicApps'], file, indent=4)
+        file.close()
+
+    with open(".\\templates\\watchlists.json", 'w', encoding='utf-8') as file:
+        json.dump(solutionPackage['Watchlists'], file, indent=4)
+        file.close()
 # Get Modified Files
 def getModifiedFiles():
     gitRemoteCommand = "git remote"
@@ -704,6 +745,7 @@ def main():
         elif (file.endswith("createUiDefinition.json")):
             createUiDefinitionFilePath = file
 
+    
     # mainTemplateFilePath = "D:\\Solution Validation\\mainTemplate.json"
     # createUiDefinitionFilePath = "D:\\Solution Validation\\createUiDefinition.json"
 
@@ -711,6 +753,8 @@ def main():
         createUiDefinitionFilePath = mainTemplateFilePath.replace("mainTemplate.json", "createUiDefinition.json")
     if mainTemplateFilePath == "":
         mainTemplateFilePath = createUiDefinitionFilePath.replace( "createUiDefinition.json", "mainTemplate.json")
+    
+    print(mainTemplateFilePath, createUiDefinitionFilePath)
     
     with open(mainTemplateFilePath, 'r', encoding='utf-8') as file:
         mainTemplateFile = json.load(file)
@@ -728,45 +772,8 @@ def main():
 
     print(solutionPackage)
 
-    with open(".\\templates\\solution.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage, file, indent=4)
-        file.close()
-
-    with open(".\\templates\\metadata.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Metadata'], file, indent=4)
-        file.close()
-
-    with open(".\\templates\\dataConnectors.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['DataConnectors'], file, indent=4)
-        file.close()
-
-    with open(".\\templates\\analyticsRules.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['AnalyticsRules'], file, indent=4)
-        file.close()
-
-    with open(".\\templates\\huntingQueries.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['HuntingQueries'], file, indent=4)
-        file.close()
-
-    with open(".\\templates\\workbooks.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Workbooks'], file, indent=4)
-        file.close()
-
-    with open(".\\templates\\parsers.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Parsers'], file, indent=4)
-        file.close()
-
-    with open(".\\templates\\playbooks.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Playbooks'], file, indent=4)
-        file.close()
-
-    with open(".\\templates\\logicApps.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['LogicApps'], file, indent=4)
-        file.close()
-
-    with open(".\\templates\\watchlists.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Watchlists'], file, indent=4)
-        file.close()
+    writeFiles(solutionPackage)
+    
 
 
 if __name__ == '__main__':
