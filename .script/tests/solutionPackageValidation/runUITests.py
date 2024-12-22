@@ -195,7 +195,7 @@ def main():
         try:
             contentTest(contentType, solution[contentType], executionIds, apiKey)
         except requests.exceptions.RequestException:
-            return
+            raise
 
     # Delete the deployed content
     deleteResources()
@@ -203,7 +203,7 @@ def main():
     try:
         metadataInstallDeleteTest(solution['Metadata'], executionResult, apiKey)
     except requests.exceptions.RequestException:
-        return
+        raise
         
 
     print(executionIds)

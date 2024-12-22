@@ -54,6 +54,7 @@ jobs:
           WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
           USERNAME: ${{ vars.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
+          TESTIM_API_KEY: ${{ secrets.TESTIM_API_KEY }}
         run: |
             filePath=".script/tests/solutionPackageValidation/runUITests.py"
             python $filePath

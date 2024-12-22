@@ -140,13 +140,13 @@ def evaluateARMExpressions(templateFile):
     try:
         deployTemplate(subscriptionId, resourceGroup, deploymentName, templateFile, accessToken, expiresOn)
     except requests.exceptions.RequestException:
-        return
+        raise
     
     # Get the list of deployed resources
     try:
         outputResources = getResources(subscriptionId, resourceGroup, deploymentName, accessToken, expiresOn)
     except (requests.exceptions.RequestException, TimeoutError):
-        return
+        raise
     
     # Filter out the contentTemplates and Watchlists
     regex = re.compile(r'.*(contentTemplates|Watchlists|contentPackages).*')
@@ -160,7 +160,7 @@ def evaluateARMExpressions(templateFile):
     try:
         exportedTemplates = getTemplate(outputResources, accessToken, expiresOn)
     except requests.exceptions.RequestException:
-        return
+        raise
 
     with open("exportedTemplates.json", 'w', encoding='utf-8') as file:
         json.dump(exportedTemplates, file, indent=4)  
