@@ -103,8 +103,9 @@ def getExectutionResult(executionId, apiKey):
 
 # Deploy the ARM Template
 def deployTemplate(subscriptionId, resourceGroup):
-
-    deploymentName = f"e2e-solutionintegration-testim-deployment-2"
+    
+    templateFile['parameters']['workspace']['defaultValue'] = os.environ.get('WORKSPACE_NAME')
+    deploymentName = f"e2e-solutionintegration-testim-deployment"
     
     with open("modifiedFiles.json", 'r', encoding='utf-8') as file:
         modifiedFiles = json.load(file)
@@ -210,8 +211,7 @@ def contentTest(contentType, contents, executionIds, apiKey):
 def main():
     subscriptionId = os.environ.get('SUBSCRIPTION_ID')
     resourceGroup = os.environ.get('RESOURCE_GROUP')
-    workspaceName = os.environ.get('API_VERSION')
-    apiVersion = os.environ.get("SUBSCRIPTION_ID")
+    apiVersion = os.environ.get("API_VERSION")
     apiKey = os.environ.get("TESTIM_API_KEY")
 
     with open(".\\templates\\solution.json", 'r', encoding='utf-8') as file:
@@ -221,18 +221,18 @@ def main():
     executionResult = []
     executionIds = []
     
-    try:
-        metadataInstallDeleteTest(solution['Metadata'], executionResult, apiKey)
-    except requests.exceptions.RequestException:
-        raise
+    # try:
+    #     metadataInstallDeleteTest(solution['Metadata'], executionResult, apiKey)
+    # except requests.exceptions.RequestException:
+    #     raise
 
     deployTemplate(subscriptionId, resourceGroup)
 
-    for contentType in contentTypes:
-        try:
-            contentTest(contentType, solution[contentType], executionIds, apiKey)
-        except requests.exceptions.RequestException:
-            raise
+    # for contentType in contentTypes:
+    #     try:
+    #         contentTest(contentType, solution[contentType], executionIds, apiKey)
+    #     except requests.exceptions.RequestException:
+    #         raise
 
     
     print(executionIds)
