@@ -125,7 +125,6 @@ def getTemplate(resources, accessToken, tokenExpiresOn):
     return exportedTemplated
 
 
-
 # Evaluate ARM Expressions in the mainTemplate.json file
 def evaluateARMExpressions(templateFile):
 
@@ -568,30 +567,15 @@ def extractInfo(evaluatedTemplates, mainTemplateFilePath, createUiDefinitionFile
 
     solutionPackage = {
         "Metadata": {},
-        "DataConnectors": {
-            "dataConnector": []
-        },
-        "AnalyticsRules": {
-            "analyticsRule": []
-        },
-        "HuntingQueries": {
-            "huntingQuery": []
-        },
-        "Workbooks": {
-            "workbook": []
-        },
-        "Parsers": {
-            "parser": []
-        },
-        "Playbooks": {
-            "playbook": []
-        },
-        "LogicApps": {
-            "logicAppsCustomConnector": []
-        },
-        "Watchlists": {
-            "watchlist": []
-        }
+        "dataConnector": [],
+        "analyticsRule": [],
+        "huntingQuery": [],
+        "workbook": [],
+        "parser": [],
+        "playbook": [],
+        "logicAppsCustomConnector": [],
+        "watchlist": [],
+        "contentPackage": {}
     }
 
     solutionPackage['Metadata'] = addMetadata(mainTemplateFilePath, createUiDefinitionFilePath)
@@ -599,30 +583,32 @@ def extractInfo(evaluatedTemplates, mainTemplateFilePath, createUiDefinitionFile
     dataConnectorMapping = {}    
 
     for content in evaluatedTemplates:
+        if content['type'] == 'Microsoft.SecurityInsights/contentpackages':
+            solutionPackage['contentPackage'].update({"properties": content['properties']})
         if content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'DataConnector':
-            solutionPackage['DataConnectors']['dataConnector'].append(addDataConnector(content['properties'], dataConnectorMapping))
-            solutionPackage['DataConnectors']['dataConnector'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['dataConnector'].append(addDataConnector(content['properties'], dataConnectorMapping))
+            solutionPackage['dataConnector'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'AnalyticsRule':
-            solutionPackage['AnalyticsRules']['analyticsRule'].append(addAnalyticsRule(content['properties'], dataConnectorMapping))
-            solutionPackage['AnalyticsRules']['analyticsRule'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['analyticsRule'].append(addAnalyticsRule(content['properties'], dataConnectorMapping))
+            solutionPackage['analyticsRule'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'HuntingQuery':
-            solutionPackage['HuntingQueries']['huntingQuery'].append(addHuntingQuery(content['properties']))
-            solutionPackage['HuntingQueries']['huntingQuery'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['huntingQuery'].append(addHuntingQuery(content['properties']))
+            solutionPackage['huntingQuery'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'Workbook':
-            solutionPackage['Workbooks']['workbook'].append(addWorkbook(content['properties']))
-            solutionPackage['Workbooks']['workbook'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['workbook'].append(addWorkbook(content['properties']))
+            solutionPackage['workbook'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'Parser':
-            solutionPackage['Parsers']['parser'].append(addParser(content['properties']))
-            solutionPackage['Parsers']['parser'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['parser'].append(addParser(content['properties']))
+            solutionPackage['parser'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'Playbook':
-            solutionPackage['Playbooks']['playbook'].append(addPlaybook(content['properties']))
-            solutionPackage['Playbooks']['playbook'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['playbook'].append(addPlaybook(content['properties']))
+            solutionPackage['playbook'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'LogicApp':
-            solutionPackage['LogicApps']['logicAppsCustomConnector'].append(addLogicAppsCustomConnector(content['properties']))
-            solutionPackage['LogicApps']['logicAppsCustomConnector'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['logicAppsCustomConnector'].append(addLogicAppsCustomConnector(content['properties']))
+            solutionPackage['logicAppsCustomConnector'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/Watchlists':
-            solutionPackage['Watchlists']['watchlist'].append(addWatchlist(content['properties']))
-            solutionPackage['Watchlists']['watchlist'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['watchlist'].append(addWatchlist(content['properties']))
+            solutionPackage['watchlist'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
 
     return solutionPackage
 
