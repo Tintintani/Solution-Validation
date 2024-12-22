@@ -623,35 +623,35 @@ def writeFiles(solutionPackage):
         file.close()
 
     with open(".\\templates\\dataConnectors.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['DataConnectors'], file, indent=4)
+        json.dump(solutionPackage['dataConnector'], file, indent=4)
         file.close()
 
     with open(".\\templates\\analyticsRules.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['AnalyticsRules'], file, indent=4)
+        json.dump(solutionPackage['analyticsRule'], file, indent=4)
         file.close()
 
     with open(".\\templates\\huntingQueries.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['HuntingQueries'], file, indent=4)
+        json.dump(solutionPackage['huntingQuery'], file, indent=4)
         file.close()
 
     with open(".\\templates\\workbooks.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Workbooks'], file, indent=4)
+        json.dump(solutionPackage['workbook'], file, indent=4)
         file.close()
 
     with open(".\\templates\\parsers.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Parsers'], file, indent=4)
+        json.dump(solutionPackage['parser'], file, indent=4)
         file.close()
 
     with open(".\\templates\\playbooks.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Playbooks'], file, indent=4)
+        json.dump(solutionPackage['playbook'], file, indent=4)
         file.close()
 
     with open(".\\templates\\logicApps.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['LogicApps'], file, indent=4)
+        json.dump(solutionPackage['logicAppsCustomConnector'], file, indent=4)
         file.close()
 
     with open(".\\templates\\watchlists.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Watchlists'], file, indent=4)
+        json.dump(solutionPackage['watchlist'], file, indent=4)
         file.close()
 
 # Get Modified Files

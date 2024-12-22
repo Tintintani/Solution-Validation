@@ -44,12 +44,16 @@ jobs:
           SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
           RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
           WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
-          USERNAME: ${{ vars.USERNAME }}
-          PASSWORD: ${{ secrets.PASSWORD }}
         run: |
             filePath=".script/tests/solutionPackageValidation/solutionPackageUIValidation.py"
             python $filePath
       - name: Run Testim
+        env:
+          SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
+          RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+          WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
+          USERNAME: ${{ vars.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
         run: |
             filePath=".script/tests/solutionPackageValidation/runUITests.py"
             python $filePath
