@@ -163,7 +163,6 @@ def deployTemplate(subscriptionId, resourceGroup):
             
             if (data['properties']['provisioningState'] == 'Succeeded'):
                 print(f"Deployment Succeeded: Deployed {len(data['properties']['outputResources'])} resources\n")
-                time.sleep(60)
                 return                
                             
             print(f"Status {response.status_code}. Retrying in 5 seconds...\n")
