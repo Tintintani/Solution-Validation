@@ -104,7 +104,6 @@ def getExectutionResult(executionId, apiKey):
 # Deploy the ARM Template
 def deployTemplate(subscriptionId, resourceGroup):
     
-    templateFile['parameters']['workspace']['defaultValue'] = os.environ.get('WORKSPACE_NAME')
     deploymentName = f"e2e-solutionintegration-testim-deployment"
     
     with open("modifiedFiles.json", 'r', encoding='utf-8') as file:
@@ -119,6 +118,8 @@ def deployTemplate(subscriptionId, resourceGroup):
         templateFile = json.load(file)
         file.close()
 
+    templateFile['parameters']['workspace']['defaultValue'] = os.environ.get('WORKSPACE_NAME')
+    
     accessToken, tokenExpiresOn = getAccessToken()
 
     if time.time() > tokenExpiresOn:
