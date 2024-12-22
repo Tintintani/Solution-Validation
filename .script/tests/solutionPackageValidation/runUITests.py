@@ -222,18 +222,18 @@ def main():
     executionResult = []
     executionIds = []
     
-    # try:
-    #     metadataInstallDeleteTest(solution['Metadata'], executionResult, apiKey)
-    # except requests.exceptions.RequestException:
-    #     raise
+    try:
+        metadataInstallDeleteTest(solution['Metadata'], executionResult, apiKey)
+    except requests.exceptions.RequestException:
+        raise
 
     deployTemplate(subscriptionId, resourceGroup)
 
-    # for contentType in contentTypes:
-    #     try:
-    #         contentTest(contentType, solution[contentType], executionIds, apiKey)
-    #     except requests.exceptions.RequestException:
-    #         raise
+    for contentType in contentTypes:
+        try:
+            contentTest(contentType, solution[contentType], executionIds, apiKey)
+        except requests.exceptions.RequestException:
+            raise
 
     
     print(executionIds)
