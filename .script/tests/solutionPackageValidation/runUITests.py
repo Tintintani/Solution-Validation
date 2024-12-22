@@ -112,6 +112,8 @@ def deployTemplate(subscriptionId, resourceGroup):
         modifiedFiles = json.load(file)
         file.close()
 
+    print(modifiedFiles)
+
     for file in modifiedFiles:
         if (file.endswith("mainTemplate.json")):
             templateFilePath = file
