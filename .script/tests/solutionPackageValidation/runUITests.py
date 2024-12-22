@@ -117,10 +117,14 @@ def deployTemplate(subscriptionId, resourceGroup):
     for file in modifiedFiles:
         if (file.endswith("mainTemplate.json")):
             templateFilePath = file
+    print(templateFilePath)
     
     with open(templateFilePath, 'r', encoding='utf-8') as file:
         templateFile = json.load(file)
         file.close()
+
+    print(templateFile)
+
 
     url = f"https://management.azure.com/subscriptions/{subscriptionId}/resourcegroups/{resourceGroup}/providers/Microsoft.Resources/deployments/{deploymentName}?api-version=2024-03-01"
 
