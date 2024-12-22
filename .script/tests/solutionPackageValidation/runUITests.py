@@ -101,48 +101,74 @@ def getExectutionResult(executionId, apiKey):
             print(f"Error while Getting Execution Result: {e}")
             raise
 
-# Delete the deployed resources
-def deleteResources():
-    count = 0
+# Deploy the ARM Template
+def deployTemplate(subscriptionId, resourceGroup):
 
+    deploymentName = f"e2e-solutionintegration-testim-deployment"
+    
     accessToken, tokenExpiresOn = getAccessToken()
 
-    with open("outputResources.json", 'r', encoding='utf-8') as file:
-        resources = json.load(file)
+    with open("modifiedFiles.json", 'r', encoding='utf-8') as file:
+        modifiedFiles = json.load(file)
         file.close()
+
+    for file in modifiedFiles:
+        if (file.endswith("mainTemplate.json")):
+            templateFile = file
     
-    for resource in resources:
-        
-        url = f"https://management.azure.com{resource['id']}?api-version=2024-09-01"
+    url = f"https://management.azure.com/subscriptions/{subscriptionId}/resourcegroups/{resourceGroup}/providers/Microsoft.Resources/deployments/{deploymentName}?api-version=2024-03-01"
 
-        headers = {
-            'Authorization': f'Bearer {accessToken}',   
-            'Content-Type': 'application/json'
+    payload = {
+        "properties": {
+            "mode": "Incremental",
+            "template": templateFile,
         }
+    }
 
-        attempts = 0
-        while attempts < 5:
-            attempts += 1
+    headers = {
+        'Authorization': f'Bearer {accessToken}',
+        'Content-Type': 'application/json'
+    }
+
+
+    try:
+        response = requests.put(url, headers=headers, data = json.dumps(payload))
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Deployment Error: {e}\n")
+        raise
+
+
+    attempts = 0
+    
+    while attempts < 10:
+        attempts += 1
+        try:
 
             if time.time() > tokenExpiresOn:
                 accessToken, tokenExpiresOn = getAccessToken()
-                
-            try:
-                response = requests.delete(url, headers=headers)
-                response.raise_for_status()
-            
-                print(f"Deleted {resource['id']}")
-                count += 1
-                break
 
-            except requests.exceptions.RequestException as e:
-                print(f"Error: {e}. Retrying in 5 seconds...")
-        else:
-            print(f"Failed to delete resource with resourceId: {resource['id']} after maximum attempts.")
+            # response = requests.get(url, headers=headers, timeout=(10, 60))
+            response = requests.get(url, headers=headers, timeout=(10, 60))
+            response.raise_for_status()
+            data = response.json()
             
-        time.sleep(2)
+            print(f"Deployment Current State: {data['properties']['provisioningState']}")
+            
+            if (data['properties']['provisioningState'] == 'Succeeded'):
+                print(f"Deployment Succeeded: Deployed {len(data['properties']['outputResources'])} resources\n")
+                return                
+                            
+            print(f"Status {response.status_code}. Retrying in 5 seconds...\n")
+            time.sleep(5)
+        
+        except requests.exceptions.RequestException as e:
+            print(f"Deployment Error: {e}")
+            raise
 
-    print(f"Deleted {count} resources, total {len(resources)}\n")
+        except requests.exceptions.Timeout as e:
+            print(f"Timeout Error: {e}")
+            raise TimeoutError
 
 # Run Metadata Install Delete Test
 def metadataInstallDeleteTest(metadata, executionResult, apiKey):
@@ -190,6 +216,13 @@ def main():
 
     executionResult = []
     executionIds = []
+    
+    try:
+        metadataInstallDeleteTest(solution['Metadata'], executionResult, apiKey)
+    except requests.exceptions.RequestException:
+        raise
+
+    deployTemplate(subscriptionId, resourceGroup)
 
     for contentType in contentTypes:
         try:
@@ -197,15 +230,7 @@ def main():
         except requests.exceptions.RequestException:
             raise
 
-    # Delete the deployed content
-    deleteResources()
-
-    try:
-        metadataInstallDeleteTest(solution['Metadata'], executionResult, apiKey)
-    except requests.exceptions.RequestException:
-        raise
-        
-
+    
     print(executionIds)
     print('\n')
     print(executionResult)

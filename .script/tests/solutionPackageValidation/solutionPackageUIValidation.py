@@ -124,6 +124,42 @@ def getTemplate(resources, accessToken, tokenExpiresOn):
 
     return exportedTemplated
 
+# Delete the deployed resources
+def deleteResources(resources, accessToken, tokenExpiresOn):
+    count = 0
+
+    for resource in resources:
+        
+        url = f"https://management.azure.com{resource['id']}?api-version=2024-09-01"
+
+        headers = {
+            'Authorization': f'Bearer {accessToken}',   
+            'Content-Type': 'application/json'
+        }
+
+        attempts = 0
+        while attempts < 5:
+            attempts += 1
+
+            if time.time() > tokenExpiresOn:
+                accessToken, tokenExpiresOn = getAccessToken()
+                
+            try:
+                response = requests.delete(url, headers=headers)
+                response.raise_for_status()
+            
+                print(f"Deleted {resource['id']}")
+                count += 1
+                break
+
+            except requests.exceptions.RequestException as e:
+                print(f"Error: {e}. Retrying in 5 seconds...")
+        else:
+            print(f"Failed to delete resource with resourceId: {resource['id']} after maximum attempts.")
+            
+        time.sleep(2)
+
+    print(f"Deleted {count} resources, total {len(resources)}\n")
 
 # Evaluate ARM Expressions in the mainTemplate.json file
 def evaluateARMExpressions(templateFile):
@@ -165,9 +201,10 @@ def evaluateARMExpressions(templateFile):
     with open("exportedTemplates.json", 'w', encoding='utf-8') as file:
         json.dump(exportedTemplates, file, indent=4)  
 
+    # Delete the deployed content
+    deleteResources(outputResources, accessToken, expiresOn)
 
     return exportedTemplates
-
 
 ############################################################################################################
 # Extract Information
