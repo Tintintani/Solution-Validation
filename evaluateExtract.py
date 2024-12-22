@@ -19,9 +19,9 @@ def getAccessToken():
     return result['accessToken'], result['expires_on']
 
 # Deploy the ARM Template
-def deployTemplate(subscriptionId, resourceGroup, deploymentName, templateFile, accessToken, tokenExpiresOn):
+def deployTemplate(subscriptionId, resourceGroup, deploymentName, templateFile, accessToken, tokenExpiresOn, apiVersion):
 
-    url = f"https://management.azure.com/subscriptions/{subscriptionId}/resourcegroups/{resourceGroup}/providers/Microsoft.Resources/deployments/{deploymentName}?api-version=2024-03-01"
+    url = f"https://management.azure.com/subscriptions/{subscriptionId}/resourcegroups/{resourceGroup}/providers/Microsoft.Resources/deployments/{deploymentName}?api-version={apiVersion}"
 
     payload = {
         "properties": {
@@ -46,9 +46,9 @@ def deployTemplate(subscriptionId, resourceGroup, deploymentName, templateFile, 
         raise
 
 # List of Deployed Resources
-def getResources(subscriptionId, resourceGroup, deploymentName, accessToken, tokenExpiresOn):
+def getResources(subscriptionId, resourceGroup, deploymentName, accessToken, tokenExpiresOn, apiVersion):
     
-    url = f"https://management.azure.com/subscriptions/{subscriptionId}/resourcegroups/{resourceGroup}/providers/Microsoft.Resources/deployments/{deploymentName}/?api-version=2024-03-01"
+    url = f"https://management.azure.com/subscriptions/{subscriptionId}/resourcegroups/{resourceGroup}/providers/Microsoft.Resources/deployments/{deploymentName}/?api-version={apiVersion}"
 
     headers = {
         'Authorization': f'Bearer {accessToken}',
@@ -87,14 +87,14 @@ def getResources(subscriptionId, resourceGroup, deploymentName, accessToken, tok
             raise TimeoutError
 
 # Export evaluated ARM Template for each resource
-def getTemplate(resources, accessToken, tokenExpiresOn):
+def getTemplate(resources, accessToken, tokenExpiresOn, apiVersion):
 
     exportedTemplated = []
     count = 0
 
     for resource in resources:
 
-        url = f"https://management.azure.com{resource['id']}?api-version=2024-09-01"
+        url = f"https://management.azure.com{resource['id']}?api-version={apiVersion}"
 
         headers = {
             'Authorization': f'Bearer {accessToken}',
@@ -123,12 +123,12 @@ def getTemplate(resources, accessToken, tokenExpiresOn):
     return exportedTemplated
 
 # Delete the deployed resources
-def deleteResources(resources, accessToken, tokenExpiresOn):
+def deleteResources(resources, accessToken, tokenExpiresOn, apiVersion):
     count = 0
 
     for resource in resources:
         
-        url = f"https://management.azure.com{resource['id']}?api-version=2024-09-01"
+        url = f"https://management.azure.com{resource['id']}?api-version={apiVersion}"
 
         headers = {
             'Authorization': f'Bearer {accessToken}',   
@@ -166,18 +166,19 @@ def evaluateARMExpressions(templateFile):
 
     subscriptionId = os.environ.get('SUBSCRIPTION_ID')
     resrouceGroup = os.environ.get('RESOURCE_GROUP')
+    apiVersion = os.environ.get('RESOURCE_GROUP')
     deploymentName = "TestDeployment"
     accessToken, expiresOn = getAccessToken()
 
     # Deploy the Template
     try:
-        deployTemplate(subscriptionId, resrouceGroup, deploymentName, templateFile, accessToken, expiresOn)
+        deployTemplate(subscriptionId, resrouceGroup, deploymentName, templateFile, accessToken, expiresOn, apiVersion)
     except requests.exceptions.RequestException:
         return
     
     # Get the list of deployed resources
     try:
-        outputResources = getResources(subscriptionId, resrouceGroup, deploymentName, accessToken, expiresOn)
+        outputResources = getResources(subscriptionId, resrouceGroup, deploymentName, accessToken, expiresOn, apiVersion)
     except (requests.exceptions.RequestException, TimeoutError):
         return
     
@@ -191,7 +192,7 @@ def evaluateARMExpressions(templateFile):
 
     # Get the templates of the deployed content
     try:
-        exportedTemplates = getTemplate(outputResources, accessToken, expiresOn)
+        exportedTemplates = getTemplate(outputResources, accessToken, expiresOn, apiVersion)
     except requests.exceptions.RequestException:
         return
 
@@ -199,7 +200,7 @@ def evaluateARMExpressions(templateFile):
         json.dump(exportedTemplates, file, indent=4)  
 
     # Delete the deployed content
-    deleteResources(outputResources, accessToken, expiresOn)
+    deleteResources(outputResources, accessToken, expiresOn, apiVersion)
 
     return exportedTemplates
 
@@ -602,30 +603,15 @@ def extractInfo(evaluatedTemplates, mainTemplateFilePath, createUiDefinitionFile
 
     solutionPackage = {
         "Metadata": {},
-        "DataConnectors": {
-            "dataConnector": []
-        },
-        "AnalyticsRules": {
-            "analyticsRule": []
-        },
-        "HuntingQueries": {
-            "huntingQuery": []
-        },
-        "Workbooks": {
-            "workbook": []
-        },
-        "Parsers": {
-            "parser": []
-        },
-        "Playbooks": {
-            "playbook": []
-        },
-        "LogicApps": {
-            "logicAppsCustomConnector": []
-        },
-        "Watchlists": {
-            "watchlist": []
-        }
+        "dataConnector": [],
+        "analyticsRule": [],
+        "huntingQuery": [],
+        "workbook": [],
+        "parser": [],
+        "playbook": [],
+        "logicAppsCustomConnector": [],
+        "watchlist": [],
+        "contentPackage": {}
     }
 
     solutionPackage['Metadata'] = addMetadata(mainTemplateFilePath, createUiDefinitionFilePath)
@@ -633,33 +619,34 @@ def extractInfo(evaluatedTemplates, mainTemplateFilePath, createUiDefinitionFile
     dataConnectorMapping = {}    
 
     for content in evaluatedTemplates:
+        if content['type'] == 'Microsoft.SecurityInsights/contentpackages':
+            solutionPackage['contentPackage'].update({"properties": content['properties']})
         if content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'DataConnector':
-            solutionPackage['DataConnectors']['dataConnector'].append(addDataConnector(content['properties'], dataConnectorMapping))
-            solutionPackage['DataConnectors']['dataConnector'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['dataConnector'].append(addDataConnector(content['properties'], dataConnectorMapping))
+            solutionPackage['dataConnector'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'AnalyticsRule':
-            solutionPackage['AnalyticsRules']['analyticsRule'].append(addAnalyticsRule(content['properties'], dataConnectorMapping))
-            solutionPackage['AnalyticsRules']['analyticsRule'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['analyticsRule'].append(addAnalyticsRule(content['properties'], dataConnectorMapping))
+            solutionPackage['analyticsRule'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'HuntingQuery':
-            solutionPackage['HuntingQueries']['huntingQuery'].append(addHuntingQuery(content['properties']))
-            solutionPackage['HuntingQueries']['huntingQuery'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['huntingQuery'].append(addHuntingQuery(content['properties']))
+            solutionPackage['huntingQuery'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'Workbook':
-            solutionPackage['Workbooks']['workbook'].append(addWorkbook(content['properties']))
-            solutionPackage['Workbooks']['workbook'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['workbook'].append(addWorkbook(content['properties']))
+            solutionPackage['workbook'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'Parser':
-            solutionPackage['Parsers']['parser'].append(addParser(content['properties']))
-            solutionPackage['Parsers']['parser'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['parser'].append(addParser(content['properties']))
+            solutionPackage['parser'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'Playbook':
-            solutionPackage['Playbooks']['playbook'].append(addPlaybook(content['properties']))
-            solutionPackage['Playbooks']['playbook'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['playbook'].append(addPlaybook(content['properties']))
+            solutionPackage['playbook'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/contenttemplates'and content['properties']['contentKind'] == 'LogicApp':
-            solutionPackage['LogicApps']['logicAppsCustomConnector'].append(addLogicAppsCustomConnector(content['properties']))
-            solutionPackage['LogicApps']['logicAppsCustomConnector'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['logicAppsCustomConnector'].append(addLogicAppsCustomConnector(content['properties']))
+            solutionPackage['logicAppsCustomConnector'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
         elif content['type'] == 'Microsoft.SecurityInsights/Watchlists':
-            solutionPackage['Watchlists']['watchlist'].append(addWatchlist(content['properties']))
-            solutionPackage['Watchlists']['watchlist'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
+            solutionPackage['watchlist'].append(addWatchlist(content['properties']))
+            solutionPackage['watchlist'][-1].update({"solutionSearchName": solutionPackage['Metadata']['searchKey']})
 
     return solutionPackage
-
 
 # Main Function
 def main():
@@ -690,35 +677,35 @@ def main():
         file.close()
 
     with open(".\\templates\\dataConnectors.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['DataConnectors'], file, indent=4)
+        json.dump(solutionPackage['dataConnector'], file, indent=4)
         file.close()
 
     with open(".\\templates\\analyticsRules.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['AnalyticsRules'], file, indent=4)
+        json.dump(solutionPackage['analyticsRule'], file, indent=4)
         file.close()
 
     with open(".\\templates\\huntingQueries.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['HuntingQueries'], file, indent=4)
+        json.dump(solutionPackage['huntingQuery'], file, indent=4)
         file.close()
 
     with open(".\\templates\\workbooks.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Workbooks'], file, indent=4)
+        json.dump(solutionPackage['workbook'], file, indent=4)
         file.close()
 
     with open(".\\templates\\parsers.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Parsers'], file, indent=4)
+        json.dump(solutionPackage['parser'], file, indent=4)
         file.close()
 
     with open(".\\templates\\playbooks.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Playbooks'], file, indent=4)
+        json.dump(solutionPackage['playbook'], file, indent=4)
         file.close()
 
     with open(".\\templates\\logicApps.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['LogicApps'], file, indent=4)
+        json.dump(solutionPackage['logicAppsCustomConnector'], file, indent=4)
         file.close()
 
     with open(".\\templates\\watchlists.json", 'w', encoding='utf-8') as file:
-        json.dump(solutionPackage['Watchlists'], file, indent=4)
+        json.dump(solutionPackage['watchlist'], file, indent=4)
         file.close()
 
 

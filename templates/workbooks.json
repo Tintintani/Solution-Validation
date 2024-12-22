@@ -1,30 +1,28 @@
-{
-    "workbook": [
-        {
-            "searchKey": "AmazonWebServicesUserActivitiesWorkbook",
-            "displayName": "AWS User Activities",
-            "description": "Gain insights into AWS user activities, including failed sign-in attempts, IP addresses, regions, user agents, and identity types, as well as potential malicious user activities with assumed roles.",
-            "kind": "Workbook",
-            "dataTypes": "AWSCloudTrail --",
-            "dataConnectorId": "AWS",
-            "version": "1.0.0",
-            "source": "Amazon Web Services",
-            "author": "Microsoft",
-            "support": "Microsoft Corporation",
-            "solutionSearchName": "Amazon Web Services"
-        },
-        {
-            "searchKey": "AmazonWebServicesNetworkActivitiesWorkbook",
-            "displayName": "AWS Network Activities",
-            "description": "Gain insights into AWS network related resource activities, including the creation, update, and deletions of security groups, network ACLs and routes, gateways, elastic load balancers, VPCs, subnets, and network interfaces.",
-            "kind": "Workbook",
-            "dataTypes": "AWSCloudTrail --",
-            "dataConnectorId": "AWS",
-            "version": "1.0.0",
-            "source": "Amazon Web Services",
-            "author": "Microsoft",
-            "support": "Microsoft Corporation",
-            "solutionSearchName": "Amazon Web Services"
-        }
-    ]
-}
+[
+    {
+        "searchKey": "AmazonWebServicesUserActivitiesWorkbook",
+        "displayName": "AWS User Activities",
+        "description": "Gain insights into AWS user activities, including failed sign-in attempts, IP addresses, regions, user agents, and identity types, as well as potential malicious user activities with assumed roles.",
+        "kind": "Workbook",
+        "dataTypes": "AWSCloudTrail --",
+        "dataConnectorId": "AWS",
+        "version": "1.0.0",
+        "source": "Amazon Web Services",
+        "author": "Microsoft",
+        "support": "Microsoft Corporation",
+        "solutionSearchName": "Amazon Web Services"
+    },
+    {
+        "searchKey": "AmazonWebServicesNetworkActivitiesWorkbook",
+        "displayName": "AWS Network Activities",
+        "description": "Gain insights into AWS network related resource activities, including the creation, update, and deletions of security groups, network ACLs and routes, gateways, elastic load balancers, VPCs, subnets, and network interfaces.",
+        "kind": "Workbook",
+        "dataTypes": "AWSCloudTrail --",
+        "dataConnectorId": "AWS",
+        "version": "1.0.0",
+        "source": "Amazon Web Services",
+        "author": "Microsoft",
+        "support": "Microsoft Corporation",
+        "solutionSearchName": "Amazon Web Services"
+    }
+]

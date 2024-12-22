@@ -124,42 +124,7 @@ def getTemplate(resources, accessToken, tokenExpiresOn):
 
     return exportedTemplated
 
-# Delete the deployed resources
-def deleteResources(resources, accessToken, tokenExpiresOn):
-    count = 0
 
-    for resource in resources:
-        
-        url = f"https://management.azure.com{resource['id']}?api-version=2024-09-01"
-
-        headers = {
-            'Authorization': f'Bearer {accessToken}',   
-            'Content-Type': 'application/json'
-        }
-
-        attempts = 0
-        while attempts < 5:
-            attempts += 1
-
-            if time.time() > tokenExpiresOn:
-                accessToken, tokenExpiresOn = getAccessToken()
-                
-            try:
-                response = requests.delete(url, headers=headers)
-                response.raise_for_status()
-            
-                print(f"Deleted {resource['id']}")
-                count += 1
-                break
-
-            except requests.exceptions.RequestException as e:
-                print(f"Error: {e}. Retrying in 5 seconds...")
-        else:
-            print(f"Failed to delete resource with resourceId: {resource['id']} after maximum attempts.")
-            
-        time.sleep(2)
-
-    print(f"Deleted {count} resources, total {len(resources)}\n")
 
 # Evaluate ARM Expressions in the mainTemplate.json file
 def evaluateARMExpressions(templateFile):
@@ -167,24 +132,25 @@ def evaluateARMExpressions(templateFile):
     templateFile['parameters']['workspace']['defaultValue'] = os.environ.get('WORKSPACE_NAME')
 
     subscriptionId = os.environ.get('SUBSCRIPTION_ID')
-    resrouceGroup = os.environ.get('RESOURCE_GROUP')
-    deploymentName = "TestDeployment"
+    resourceGroup = os.environ.get('RESOURCE_GROUP')
+    deploymentName = f"e2e-solutionintegration-testim-deployment"
+
     accessToken, expiresOn = getAccessToken()
 
     # Deploy the Template
     try:
-        deployTemplate(subscriptionId, resrouceGroup, deploymentName, templateFile, accessToken, expiresOn)
+        deployTemplate(subscriptionId, resourceGroup, deploymentName, templateFile, accessToken, expiresOn)
     except requests.exceptions.RequestException:
         return
     
     # Get the list of deployed resources
     try:
-        outputResources = getResources(subscriptionId, resrouceGroup, deploymentName, accessToken, expiresOn)
+        outputResources = getResources(subscriptionId, resourceGroup, deploymentName, accessToken, expiresOn)
     except (requests.exceptions.RequestException, TimeoutError):
         return
     
-    # Filter out the contentTemplates andand Watchlists
-    regex = re.compile(r'.*(contentTemplates|andWatchlists|contentPackages).*')
+    # Filter out the contentTemplates and Watchlists
+    regex = re.compile(r'.*(contentTemplates|Watchlists|contentPackages).*')
     outputResources = [resource for resource in outputResources if regex.match(resource['id'])]
 
     with open("outputResources.json", 'w', encoding='utf-8') as file:
@@ -200,8 +166,6 @@ def evaluateARMExpressions(templateFile):
     with open("exportedTemplates.json", 'w', encoding='utf-8') as file:
         json.dump(exportedTemplates, file, indent=4)  
 
-    # Delete the deployed content
-    deleteResources(outputResources, accessToken, expiresOn)
 
     return exportedTemplates
 
@@ -726,6 +690,10 @@ def getModifiedFiles():
 
     # for file in diffResult.stdout.split('\n'):
     #     if re.match(r"Solutions/.*/Package/mainTemplate.json", file) or re.match(r"Solutions/.*/Package/createUiDefinition.json", file):
+
+    with open("modifiedFiles.json", 'w', encoding='utf-8') as file:
+        json.dump(modifiedFiles, file, indent=4)
+        file.close()
     
     return modifiedFiles
 
