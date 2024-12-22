@@ -104,28 +104,25 @@ def getExectutionResult(executionId, apiKey):
 # Deploy the ARM Template
 def deployTemplate(subscriptionId, resourceGroup):
 
-    deploymentName = f"e2e-solutionintegration-testim-deployment"
+    deploymentName = f"e2e-solutionintegration-testim-deployment-2"
     
-    accessToken, tokenExpiresOn = getAccessToken()
-
     with open("modifiedFiles.json", 'r', encoding='utf-8') as file:
         modifiedFiles = json.load(file)
         file.close()
 
-    print(modifiedFiles)
-
     for file in modifiedFiles:
         if (file.endswith("mainTemplate.json")):
             templateFilePath = file
-    print(templateFilePath)
-    
+
     with open(templateFilePath, 'r', encoding='utf-8') as file:
         templateFile = json.load(file)
         file.close()
 
-    print(templateFile)
+    accessToken, tokenExpiresOn = getAccessToken()
 
-
+    if time.time() > tokenExpiresOn:
+        accessToken, tokenExpiresOn = getAccessToken()
+    
     url = f"https://management.azure.com/subscriptions/{subscriptionId}/resourcegroups/{resourceGroup}/providers/Microsoft.Resources/deployments/{deploymentName}?api-version=2024-03-01"
 
     payload = {
@@ -140,7 +137,6 @@ def deployTemplate(subscriptionId, resourceGroup):
         'Content-Type': 'application/json'
     }
 
-
     try:
         response = requests.put(url, headers=headers, data = json.dumps(payload))
         response.raise_for_status()
@@ -148,13 +144,11 @@ def deployTemplate(subscriptionId, resourceGroup):
         print(f"Deployment Error: {e}\n")
         raise
 
-
     attempts = 0
     
     while attempts < 10:
         attempts += 1
         try:
-
             if time.time() > tokenExpiresOn:
                 accessToken, tokenExpiresOn = getAccessToken()
 
