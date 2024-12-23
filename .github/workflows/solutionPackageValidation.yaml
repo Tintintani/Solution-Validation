@@ -46,23 +46,22 @@ jobs:
           azcliversion: latest
           inlineScript: |
             az account show
-
-      # - name: Install dependencies
-      #   run: |
-      #       python -m pip install --upgrade pip
-      #       pip install python-dotenv
-      #       pip install requests
-      # - name: Run Solution Package Validation Test
-      #   env:
-      #     SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
-      #     RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
-      #     WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
-      #   run: |
-      #       filePath=".script/tests/solutionPackageValidation/solutionPackageUIValidation.py"
-      #       python $filePath
+      - name: Install dependencies
+        run: |
+            python -m pip install --upgrade pip
+            pip install python-dotenv
+            pip install requests
+      - name: Run Solution Package Validation Test
+        env:
+          SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+          WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
+        run: |
+            filePath=".script/tests/solutionPackageValidation/solutionPackageUIValidation.py"
+            python $filePath
       # - name: Run Testim
       #   env:
-      #     SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
+      #     SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       #     RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
       #     WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
       #     USERNAME: ${{ vars.USERNAME }}
