@@ -36,15 +36,12 @@ jobs:
         run: |
           curl -u :$ADO_PAT \
             -o solutionPackageUIValidation.py \
-            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/solutionPackageUIValidation.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
-          curl -u :$ADO_PAT \
+            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/solutionPackageUIValidation.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
             -o runUITests.py \
             "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
       - name: List files
         run: |
           ls -l
-          cat solutionPackageUIValidation.py
-          cat runUITests.py
 
       
       # - name: Setup Python Environment
