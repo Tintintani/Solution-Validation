@@ -39,7 +39,7 @@ jobs:
             "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/Syslog-cef-data-replicator/pycef.py&api-version=6.0"
       - name: List files
         run: |
-          ls -l
+          cat test.py
 
       
       # - name: Setup Python Environment
