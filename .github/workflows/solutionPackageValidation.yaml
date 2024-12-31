@@ -35,11 +35,12 @@ jobs:
           ADO_PAT: ${{ secrets.ADO_PAT }}
         run: |
           curl -u :$ADO_PAT \
-            -o test.py \
-            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/Syslog-cef-data-replicator/pycef.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
+            -O "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/solutionPackageUIValidation.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
+          curl -u :$ADO_PAT \
+            -O "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/solutionPackageUIValidation.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
       - name: List files
         run: |
-          cat test.py
+          ls -l
 
       
       # - name: Setup Python Environment
