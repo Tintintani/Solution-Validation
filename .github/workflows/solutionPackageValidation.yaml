@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 jobs:
-  Run-solutionIntegration-Testim.io:
+  Run-solutionIntegration-Testimio:
     name: Solution Integration Testing - Testim.io
     runs-on: ubuntu-latest
     steps:
