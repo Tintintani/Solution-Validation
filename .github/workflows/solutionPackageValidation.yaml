@@ -48,8 +48,8 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            $accessToken = az account get-access-token --output json | ConvertFrom-Json
-            $accessToken = $accessToken.accessToken
+            $access = az account get-access-token -o json | ConvertFrom-Json 
+            $accessToken = $access.accessToken 
 
       - name: Download files from ADO
         run: |
