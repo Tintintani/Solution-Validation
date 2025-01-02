@@ -15,8 +15,8 @@ permissions:
   contents: read
 
 jobs:
-  Run-ExtractContent:
-    name: Solution Package UI Testing - Testim.io
+  Setup-Environment:
+    name: Setup Environment
     runs-on: ubuntu-latest
     steps:
       - name: Chekout pull request braanch
@@ -38,25 +38,30 @@ jobs:
             -o solutionPackageUIValidation.py \
             "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/solutionPackageUIValidation.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
             -o runUITests.py \
-            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
-      - name: List files
+            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+            -o requirements.txt \
+            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
+      - name: Setup Python Environment
+        uses: actions/setup-python@v2
+        with:
+            python-version: '3.x'
+      - name: Azure Login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Azure CLI script
         run: |
-          ls -l
-
-      
-      # - name: Setup Python Environment
-      #   uses: actions/setup-python@v2
-      #   with:
-      #       python-version: '3.x'
-      # - name: Azure Login
-      #   uses: azure/login@v2
-      #   with:
-      #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
-      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      # - name: Azure CLI script
-      #   run: |
-      #       az account show
+            az account show
+      - name: Azure Login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_MS_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_MS_TENANT_ID }}
+      - name: Azure CLI script
+        run: |
+            az account show
       # - name: Install dependencies
       #   run: |
       #       python -m pip install --upgrade pip
