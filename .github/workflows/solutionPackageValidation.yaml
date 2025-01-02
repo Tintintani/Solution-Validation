@@ -44,11 +44,8 @@ jobs:
             az account show
 
       - name: Get Access Token
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlineScript: |
-            $access = az account get-access-token -o json | ConvertFrom-Json 
+        run: |
+            $access = az account get-access-token -o json
             $accessToken = $access.accessToken 
 
       - name: Download files from ADO
