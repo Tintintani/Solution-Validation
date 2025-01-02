@@ -44,9 +44,12 @@ jobs:
             az account show
 
       - name: Get Access Token
-        run: | 
-              $accessToken = az account get-access-token | ConvertFrom-Json
-              $accessToken = $accessToken.accessToken
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            $accessToken = az account get-access-token | ConvertFrom-Json
+            $accessToken = $accessToken.accessToken
 
       - name: Download files from ADO
         run: |
@@ -86,7 +89,6 @@ jobs:
           allow-no-subscriptions: true
 
       - name: Azure CLI script
-        uses: azure/cli@v2
         run: |
             az account show
       
