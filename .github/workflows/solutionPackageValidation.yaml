@@ -41,11 +41,11 @@ jobs:
 
       - name: Azure CLI script
         run: |
-            az account show --output tsv --query user.name
+            az account show
 
       - name: Get Access Token
         run: |
-            echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV 
+            echo "accessToken=$(az account get-access-token -o tsv --query accessToken --resource 499b84ac-1321-427f-aa17-267ca6975798)" >> $GITHUB_ENV 
 
       - name: Download files from ADO
         run: |
