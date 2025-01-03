@@ -46,6 +46,9 @@ jobs:
       - name: Get Access Token
         run: |
             echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV 
+
+      - name: Echo Access Token
+        run: |
             echo $accessToken         
 
       - name: Download files from ADO
