@@ -45,11 +45,12 @@ jobs:
 
       - name: Get Access Token
         run: |
-            echo "accessToken=$(az account get-access-token -o tsv --query accessToken --resource 499b84ac-1321-427f-aa17-267ca6975798)" >> $GITHUB_ENV 
+            echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV 
 
       - name: Download files from ADO
+        env: ADO_PAT: ${{ secrets.ADO_PAT }}
         run: |
-          curl -u :$accessToken \
+          curl -u :$ADO_PAT \
             -o solutionPackageUIValidation.py \
             "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/solutionPackageUIValidation.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
             -o runUITests.py \
