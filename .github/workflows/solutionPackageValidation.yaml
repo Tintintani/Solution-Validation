@@ -48,7 +48,8 @@ jobs:
             echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV 
 
       - name: Download files from ADO
-        env: ADO_PAT: ${{ secrets.ADO_PAT }}
+        env: 
+          ADO_PAT: ${{ secrets.ADO_PAT }}
         run: |
           curl -u :$ADO_PAT \
             -o solutionPackageUIValidation.py \
