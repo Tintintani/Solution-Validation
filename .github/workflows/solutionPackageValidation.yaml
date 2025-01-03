@@ -46,7 +46,7 @@ jobs:
       - name: Get Access Token
         run: |
             echo "accessToken = $(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
-      -name: T
+      -name: Test Access Token
         run: | 
             echo $accessToken         
 
