@@ -49,7 +49,7 @@ jobs:
 
       - name: Show Subscription ID
         run: |
-            echo {{env.subscriptionId}}
+            echo ${{ env.subscriptionId }}
 
       # - name: Get Access Token
       #   run: |
