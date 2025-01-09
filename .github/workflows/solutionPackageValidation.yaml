@@ -32,33 +32,40 @@ jobs:
               git config --local user.name "github-actions[bot]"
               git config --local user.email "<>"
 
-      - name: Azure Login to MS Account 
+      - name: Azure Login to Dev Account 
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           allow-no-subscriptions: true
 
+      - name: Get Test Tenant Subscription
+        run: |
+            echo "subscriptionId=$(az account list --query id -o tsv)" >> $GITHUB_ENV
+
       - name: Azure CLI script
         run: |
             az account show
 
-      - name: Get Access Token
+      - name: Show Subscription ID
         run: |
-            echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV 
+            echo {{env.subscriptionId}}
 
-      - name: Download files from ADO
-        env: 
-          ADO_PAT: ${{ secrets.ADO_PAT }}
-        run: |
-          curl -u :$ADO_PAT \
-            -o solutionPackageUIValidation.py \
-            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/solutionPackageUIValidation.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
-            -o runUITests.py \
-            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
-            -o requirements.txt \
-            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
-          cat requirements.txt
+      # - name: Get Access Token
+      #   run: |
+      #       echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV 
+
+      # - name: Download files from ADO
+      #   env: 
+      #     ADO_PAT: ${{ secrets.ADO_PAT }}
+      #   run: |
+      #     curl -u :$ADO_PAT \
+      #       -o solutionPackageUIValidation.py \
+      #       "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/solutionPackageUIValidation.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+      #       -o runUITests.py \
+      #       "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+      #       -o requirements.txt \
+      #       "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
 
       - name: Setup Python Environment
         uses: actions/setup-python@v2
@@ -70,13 +77,9 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r requirements.txt
 
-      # - name: Run Extract and Evaluate Template Files
-      #   env:
-      #     SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      #     RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
-      #     WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
+      # - name: Extract and Evaluate Template Files
       #   run: |
-      #       filePath=".script/tests/solutionPackageValidation/solutionPackageUIValidation.py"
+      #       filePath=".script/tests/solutionPackageValidation/extractAndEvaluateTemplates.py"
       #       python $filePath
 
       - name: Azure Login to Test Account
@@ -89,8 +92,13 @@ jobs:
       - name: Azure CLI script
         run: |
             az account show
+
+      # - name: Deploy Solution to Workspace
+      #   run: |
+      #       filePath=".script/tests/solutionPackageValidation/runUITests.py"
+      #       python $filePath deploy
       
-      - name: Azure Login to MS Account 
+      - name: Azure Login to Dev Account 
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -103,13 +111,6 @@ jobs:
 
       
       # - name: Run Testim
-      #   env:
-      #     SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      #     RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
-      #     WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
-      #     USERNAME: ${{ vars.USERNAME }}
-      #     PASSWORD: ${{ secrets.PASSWORD }}
-      #     TESTIM_API_KEY: ${{ secrets.TESTIM_API_KEY }}
       #   run: |
       #       filePath=".script/tests/solutionPackageValidation/runUITests.py"
-      #       python $filePath
+      #       python $filePath runTests
