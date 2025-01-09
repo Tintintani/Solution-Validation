@@ -42,7 +42,7 @@ jobs:
       - name: Get Test Tenant Subscription
         run: |
             echo "subscriptionId=$(az account list --query id -o tsv)" >> $GITHUB_ENV
-            echo $env.subscriptionId
+            echo $subscriptionId
 
       - name: Azure CLI script
         run: |
