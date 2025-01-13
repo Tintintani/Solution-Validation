@@ -40,7 +40,7 @@ jobs:
 
     - name: Whitelist Runner IP
       run: |
-        az account show
+        az keyvault list
         agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule add --name e2e-solIntegTesting-KV --ip-address $agentIP
 
