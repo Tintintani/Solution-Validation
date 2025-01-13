@@ -41,7 +41,7 @@ jobs:
     - name: Whitelist Runner IP
       run: |
         agentIP=$(curl -s https://api.ipify.org/)
-        az keyvault network-rule add --name e2e-solIntegTesting-KV --ip-address agentIP
+        az keyvault network-rule add --name e2e-solIntegTesting-KV --ip-address $agentIP
 
     # - name: Get Access Token
     #   run: |
@@ -110,6 +110,6 @@ jobs:
     #     filePath=".script/tests/solutionPackageValidation/runUITests.py"
     #     python $filePath runTests
 
-    -name: Delist Runner IP
+    - name: Delist Runner IP
       run: |
-        az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address agentIP
+        az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address $agentIP
