@@ -6,7 +6,6 @@ on:
       - master
     paths:
       - 'Solutions/**/Package/mainTemplate.json'
-      - 'Solutions/**/Package/createUiDefinition.json'
 
     # Allows to run workflow manually from the Actions tab
     workflow_dispatch:
@@ -39,25 +38,24 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           allow-no-subscriptions: true
 
-      - name: Azure CLI script
+      - name: Whitelist Runner IP
         run: |
-            az keyvault secret show --name Testim-API-Key --vault-name Tanishq-Test-KV --query value --outpu tsv
+            agentIP=$(curl -s https://api.ipify.org/)
+            az keyvault network-rule add --name e2e-solIntegTesting-KV --ip-address agentIP
 
       # - name: Get Access Token
       #   run: |
       #       echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV 
 
-      # - name: Download files from ADO
-      #   env: 
-      #     ADO_PAT: ${{ secrets.ADO_PAT }}
-      #   run: |
-      #     curl -u :$ADO_PAT \
-      #       -o solutionPackageUIValidation.py \
-      #       "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/solutionPackageUIValidation.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
-      #       -o runUITests.py \
-      #       "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
-      #       -o requirements.txt \
-      #       "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
+      - name: Download files from ADO
+        run: |
+          curl -u :${{ secrets.ADO_PAT }} \
+            -o solutionPackageUIValidation.py \
+            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/solutionPackageUIValidation.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+            -o runUITests.py \
+            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+            -o requirements.txt \
+            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
 
       - name: Setup Python Environment
         uses: actions/setup-python@v2
@@ -69,10 +67,10 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r requirements.txt
 
-      # - name: Extract and Evaluate Template Files
-      #   run: |
-      #       filePath=".script/tests/solutionPackageValidation/extractAndEvaluateTemplates.py"
-      #       python $filePath
+      - name: Extract and Evaluate Template Files
+        run: |
+            filePath=".script/tests/solutionPackageValidation/extractAndEvaluateTemplates.py"
+            python $filePath
 
       - name: Azure Login to Test Tenant Account
         uses: azure/login@v2
@@ -109,3 +107,7 @@ jobs:
       #   run: |
       #       filePath=".script/tests/solutionPackageValidation/runUITests.py"
       #       python $filePath runTests
+
+      -name: Delist Runner IP
+        run: |
+            az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address agentIP
