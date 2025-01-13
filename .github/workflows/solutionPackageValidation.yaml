@@ -39,19 +39,9 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           allow-no-subscriptions: true
 
-      - name: Get Test Tenant Subscription
-        run: |
-
-            echo "subscriptionId=$(az account show --query id -o tsv)" >> $GITHUB_ENV
-            echo $subscriptionId
-
       - name: Azure CLI script
         run: |
-            az account show
-
-      - name: Show Subscription ID
-        run: |
-            echo ${{ env.subscriptionId }}
+            az keyvault secret show --name Testim-API-Key --vault-name Tanishq-Test-KV --query value --outpu tsv
 
       # - name: Get Access Token
       #   run: |
@@ -84,7 +74,7 @@ jobs:
       #       filePath=".script/tests/solutionPackageValidation/extractAndEvaluateTemplates.py"
       #       python $filePath
 
-      - name: Azure Login to Test Account
+      - name: Azure Login to Test Tenant Account
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_TEST_CLIENT_ID }}
@@ -94,6 +84,10 @@ jobs:
       - name: Azure CLI script
         run: |
             az account show
+
+      - name: Get Test Tenant Subscription
+        run: |
+            echo "TEST_TENANT_SUBSCRIPTION_ID=$(az account show --query id -o tsv)" >> $GITHUB_ENV
 
       # - name: Deploy Solution to Workspace
       #   run: |
@@ -111,7 +105,6 @@ jobs:
         run: |
             az account show
 
-      
       # - name: Run Testim
       #   run: |
       #       filePath=".script/tests/solutionPackageValidation/runUITests.py"
