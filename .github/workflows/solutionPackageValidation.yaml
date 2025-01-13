@@ -40,7 +40,6 @@ jobs:
 
     - name: Whitelist Runner IP
       run: |
-        az keyvault list
         agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule add --name e2e-solIntegTesting-KV --ip-address $agentIP
 
@@ -53,8 +52,8 @@ jobs:
         ADO_PAT: ${{ secrets.ADO_PAT }}
       run: |
         curl -u :$ADO_PAT \
-        -o evaluateAndExtractTemplates.py \
-        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplates.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+        -o evaluateAndExtractTemplate.py \
+        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplate.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
         -o runUITests.py \
         "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
         -o requirements.txt \
@@ -72,7 +71,7 @@ jobs:
 
     - name: Evaluate and Extract Template Files
       run: |
-        filePath="evaluateAndExtractTemplates.py"
+        filePath="evaluateAndExtractTemplate.py"
         python $filePath
 
     - name: Azure Login to Test Tenant Account
