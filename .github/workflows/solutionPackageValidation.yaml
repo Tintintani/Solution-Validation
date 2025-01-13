@@ -50,8 +50,8 @@ jobs:
       - name: Download files from ADO
         run: |
           curl -u :${{ secrets.ADO_PAT }} \
-            -o solutionPackageUIValidation.py \
-            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/solutionPackageUIValidation.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+            -o extractAndEvaluateTemplates.py \
+            "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/extractAndEvaluateTemplates.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
             -o runUITests.py \
             "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
             -o requirements.txt \
@@ -69,7 +69,7 @@ jobs:
 
       - name: Extract and Evaluate Template Files
         run: |
-            filePath=".script/tests/solutionPackageValidation/extractAndEvaluateTemplates.py"
+            filePath="extractAndEvaluateTemplates.py"
             python $filePath
 
       - name: Azure Login to Test Tenant Account
