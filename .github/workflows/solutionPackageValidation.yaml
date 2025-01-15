@@ -89,10 +89,10 @@ jobs:
       run: |
         echo "TEST_TENANT_SUBSCRIPTION_ID=$(az account show --query id -o tsv)" >> $GITHUB_ENV
 
-    # - name: Deploy Solution to Workspace
-    #   run: |
-    #     filePath=".script/tests/solutionPackageValidation/runUITests.py"
-    #     python $filePath deploy
+    - name: Deploy Solution to Workspace
+      run: |
+        filePath="runUITests.py"
+        python $filePath deploy
     
     - name: Azure Login to Dev Account 
       uses: azure/login@v2
@@ -105,10 +105,14 @@ jobs:
       run: |
         az account show
 
-    # - name: Run Testim
-    #   run: |
-    #     filePath=".script/tests/solutionPackageValidation/runUITests.py"
-    #     python $filePath runTests
+    - name: Run Testim
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        filePath="runUITests.py"
+        python $filePath runTests
 
     - name: Delist Runner IP
       run: |
