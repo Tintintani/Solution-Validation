@@ -6,9 +6,8 @@ on:
       - master
     paths:
       - 'Solutions/**/Package/mainTemplate.json'
-
-    # Allows to run workflow manually from the Actions tab
-    workflow_dispatch:
+    
+    workflow_dispatch: # Allows to run workflow manually from the Actions tab
 permissions:
   id-token: write
   contents: read
@@ -19,11 +18,11 @@ jobs:
     name: Solution Integration Testing - Testim.io
     runs-on: ubuntu-latest
     steps:
-    - name: Chekout pull request braanch
+    - name: Checkout pull request branch
       uses: actions/checkout@v3
       with:
-        ref: ${{github.event.pull_request.head.ref}}
-        repository: ${{github.event.pull_request.head.repo.full_name}}
+        ref: ${{ github.event.pull_request.head.ref }}
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
         # persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
         fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
     
@@ -44,15 +43,13 @@ jobs:
         agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule add --name e2e-solIntegTesting-KV --ip-address $agentIP
 
-    # - name: Get Access Token
-    #   run: |
-    #       echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
+    - name: Get Access Token
+      run: |
+        echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
 
     - name: Download files from ADO
-      env:
-        ADO_PAT: ${{ secrets.ADO_PAT }}
       run: |
-        curl -u :$ADO_PAT \
+        curl -u :${{ env.accessToken }} \
         -o evaluateAndExtractTemplate.py \
         "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplate.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
         -o runUITests.py \
@@ -98,7 +95,7 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         allow-no-subscriptions: true
 
-    - name: Run Testim
+    - name: Execute Tests on Testim
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}
@@ -108,5 +105,7 @@ jobs:
         python $filePath runTests
 
     - name: Delist Runner IP
+      if: '!cancelled()'
       run: |
+        agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address $agentIP
