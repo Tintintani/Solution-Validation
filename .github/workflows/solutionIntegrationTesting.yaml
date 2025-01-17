@@ -19,11 +19,11 @@ jobs:
     name: Solution Integration Testing - Testim.io
     runs-on: ubuntu-latest
     steps:
-    - name: Chekout pull request braanch
+    - name: Chekout pull request branch
       uses: actions/checkout@v3
       with:
-        ref: ${{github.event.pull_request.head.ref}}
-        repository: ${{github.event.pull_request.head.repo.full_name}}
+        ref: ${{ github.event.pull_request.head.ref }}
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
         # persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
         fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
     
@@ -43,10 +43,11 @@ jobs:
       run: |
         agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule add --name e2e-solIntegTesting-KV --ip-address $agentIP
+        echo "WHITELIST_SUCCESS=true" >> $GITHUB_ENV
 
     - name: Get Access Token
       run: |
-          echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
+        echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
 
     - name: Download files from ADO
       run: |
@@ -106,5 +107,6 @@ jobs:
         python $filePath runTests
 
     - name: Delist Runner IP
+      if: env.WHITELIST_SUCCESS == 'true'
       run: |
         az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address $agentIP
