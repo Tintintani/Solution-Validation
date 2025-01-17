@@ -109,4 +109,5 @@ jobs:
     - name: Delist Runner IP
       if: env.WHITELIST_SUCCESS == 'true'
       run: |
+        agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address $agentIP
