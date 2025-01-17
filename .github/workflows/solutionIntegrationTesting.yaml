@@ -43,7 +43,6 @@ jobs:
       run: |
         agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule add --name e2e-solIntegTesting-KV --ip-address $agentIP
-        echo "WHITELIST_SUCCESS=true" >> $GITHUB_ENV
 
     - name: Get Access Token
       run: |
@@ -107,7 +106,7 @@ jobs:
         python $filePath runTests
 
     - name: Delist Runner IP
-      if: env.WHITELIST_SUCCESS == 'true'
+      if: '!cancelled()'
       run: |
         agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address $agentIP
