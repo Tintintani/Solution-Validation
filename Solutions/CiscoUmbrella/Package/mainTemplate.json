@@ -41,7 +41,7 @@
     "email": "support@microsoft.com",
     "_email": "[variables('email')]",
     "_solutionName": "CiscoUmbrella",
-    "_solutionVersion": "3.0.3",
+    "_solutionVersion": "3.0.2",
     "solutionId": "azuresentinel.azure-sentinel-solution-ciscoumbrella",
     "_solutionId": "[variables('solutionId')]",
     "uiConfigId1": "CiscoUmbrellaDataConnector",
@@ -261,7 +261,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrella data connector with template version 3.0.3",
+        "description": "CiscoUmbrella data connector with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('dataConnectorVersion1')]",
@@ -754,7 +754,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrella Workbook with template version 3.0.3",
+        "description": "CiscoUmbrella Workbook with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('workbookVersion1')]",
@@ -854,7 +854,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaConnectionNon-CorporatePrivateNetwork_AnalyticalRules Analytics Rule with template version 3.0.3",
+        "description": "CiscoUmbrellaConnectionNon-CorporatePrivateNetwork_AnalyticalRules Analytics Rule with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('analyticRuleObject1').analyticRuleVersion1]",
@@ -960,7 +960,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaConnectionToUnpopularWebsiteDetected_AnalyticalRules Analytics Rule with template version 3.0.3",
+        "description": "CiscoUmbrellaConnectionToUnpopularWebsiteDetected_AnalyticalRules Analytics Rule with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('analyticRuleObject2').analyticRuleVersion2]",
@@ -1078,7 +1078,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaCryptoMinerUserAgentDetected_AnalyticalRules Analytics Rule with template version 3.0.3",
+        "description": "CiscoUmbrellaCryptoMinerUserAgentDetected_AnalyticalRules Analytics Rule with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('analyticRuleObject3').analyticRuleVersion3]",
@@ -1198,7 +1198,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaEmptyUserAgentDetected_AnalyticalRules Analytics Rule with template version 3.0.3",
+        "description": "CiscoUmbrellaEmptyUserAgentDetected_AnalyticalRules Analytics Rule with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('analyticRuleObject4').analyticRuleVersion4]",
@@ -1314,7 +1314,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaHackToolUserAgentDetected_AnalyticalRules Analytics Rule with template version 3.0.3",
+        "description": "CiscoUmbrellaHackToolUserAgentDetected_AnalyticalRules Analytics Rule with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('analyticRuleObject5').analyticRuleVersion5]",
@@ -1437,7 +1437,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaPowershellUserAgentDetected_AnalyticalRules Analytics Rule with template version 3.0.3",
+        "description": "CiscoUmbrellaPowershellUserAgentDetected_AnalyticalRules Analytics Rule with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('analyticRuleObject6').analyticRuleVersion6]",
@@ -1557,7 +1557,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaRareUserAgentDetected_AnalyticalRules Analytics Rule with template version 3.0.3",
+        "description": "CiscoUmbrellaRareUserAgentDetected_AnalyticalRules Analytics Rule with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('analyticRuleObject7').analyticRuleVersion7]",
@@ -1675,7 +1675,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaRequestAllowedHarmfulMaliciousURICategory_AnalyticalRules Analytics Rule with template version 3.0.3",
+        "description": "CiscoUmbrellaRequestAllowedHarmfulMaliciousURICategory_AnalyticalRules Analytics Rule with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('analyticRuleObject8').analyticRuleVersion8]",
@@ -1793,7 +1793,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaRequestBlocklistedFileType_AnalyticalRules Analytics Rule with template version 3.0.3",
+        "description": "CiscoUmbrellaRequestBlocklistedFileType_AnalyticalRules Analytics Rule with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('analyticRuleObject9').analyticRuleVersion9]",
@@ -1908,7 +1908,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaURIContainsIPAddress_AnalyticalRules Analytics Rule with template version 3.0.3",
+        "description": "CiscoUmbrellaURIContainsIPAddress_AnalyticalRules Analytics Rule with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('analyticRuleObject10').analyticRuleVersion10]",
@@ -2023,7 +2023,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaAnomalousFQDNsforDomain_HuntingQueries Hunting Query with template version 3.0.3",
+        "description": "CiscoUmbrellaAnomalousFQDNsforDomain_HuntingQueries Hunting Query with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('huntingQueryObject1').huntingQueryVersion1]",
@@ -2108,7 +2108,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaBlockedUserAgents_HuntingQueries Hunting Query with template version 3.0.3",
+        "description": "CiscoUmbrellaBlockedUserAgents_HuntingQueries Hunting Query with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('huntingQueryObject2').huntingQueryVersion2]",
@@ -2193,7 +2193,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaDNSErrors_HuntingQueries Hunting Query with template version 3.0.3",
+        "description": "CiscoUmbrellaDNSErrors_HuntingQueries Hunting Query with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('huntingQueryObject3').huntingQueryVersion3]",
@@ -2278,7 +2278,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaDNSRequestsUunreliableCategory_HuntingQueries Hunting Query with template version 3.0.3",
+        "description": "CiscoUmbrellaDNSRequestsUunreliableCategory_HuntingQueries Hunting Query with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('huntingQueryObject4').huntingQueryVersion4]",
@@ -2363,7 +2363,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaHighCountsOfTheSameBytesInSize_HuntingQueries Hunting Query with template version 3.0.3",
+        "description": "CiscoUmbrellaHighCountsOfTheSameBytesInSize_HuntingQueries Hunting Query with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('huntingQueryObject5').huntingQueryVersion5]",
@@ -2448,7 +2448,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaHighValuesOfUploadedData_HuntingQueries Hunting Query with template version 3.0.3",
+        "description": "CiscoUmbrellaHighValuesOfUploadedData_HuntingQueries Hunting Query with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('huntingQueryObject6').huntingQueryVersion6]",
@@ -2533,7 +2533,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaPossibleConnectionC2_HuntingQueries Hunting Query with template version 3.0.3",
+        "description": "CiscoUmbrellaPossibleConnectionC2_HuntingQueries Hunting Query with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('huntingQueryObject7').huntingQueryVersion7]",
@@ -2618,7 +2618,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaPossibleDataExfiltration_HuntingQueries Hunting Query with template version 3.0.3",
+        "description": "CiscoUmbrellaPossibleDataExfiltration_HuntingQueries Hunting Query with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('huntingQueryObject8').huntingQueryVersion8]",
@@ -2703,7 +2703,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaProxyAllowedUnreliableCategory_HuntingQueries Hunting Query with template version 3.0.3",
+        "description": "CiscoUmbrellaProxyAllowedUnreliableCategory_HuntingQueries Hunting Query with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('huntingQueryObject9').huntingQueryVersion9]",
@@ -2788,7 +2788,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaRequestsUncategorizedURI_HuntingQueries Hunting Query with template version 3.0.3",
+        "description": "CiscoUmbrellaRequestsUncategorizedURI_HuntingQueries Hunting Query with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('huntingQueryObject10').huntingQueryVersion10]",
@@ -2873,7 +2873,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "Cisco_Umbrella Data Parser with template version 3.0.3",
+        "description": "Cisco_Umbrella Data Parser with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('parserObject1').parserVersion1]",
@@ -3005,7 +3005,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaEnforcementAPIConnector Playbook with template version 3.0.3",
+        "description": "CiscoUmbrellaEnforcementAPIConnector Playbook with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('playbookVersion1')]",
@@ -3366,7 +3366,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaInvestigateAPIConnector Playbook with template version 3.0.3",
+        "description": "CiscoUmbrellaInvestigateAPIConnector Playbook with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('playbookVersion2')]",
@@ -3824,7 +3824,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaManagementAPIConnector Playbook with template version 3.0.3",
+        "description": "CiscoUmbrellaManagementAPIConnector Playbook with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('playbookVersion3')]",
@@ -4633,7 +4633,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrellaNetworkDeviceManagementAPIConnector Playbook with template version 3.0.3",
+        "description": "CiscoUmbrellaNetworkDeviceManagementAPIConnector Playbook with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('playbookVersion4')]",
@@ -4947,7 +4947,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrella-AddIpToDestinationList Playbook with template version 3.0.3",
+        "description": "CiscoUmbrella-AddIpToDestinationList Playbook with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('playbookVersion5')]",
@@ -6151,7 +6151,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrella-AssignPolicyToIdentity Playbook with template version 3.0.3",
+        "description": "CiscoUmbrella-AssignPolicyToIdentity Playbook with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('playbookVersion6')]",
@@ -6636,7 +6636,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrella-BlockDomain Playbook with template version 3.0.3",
+        "description": "CiscoUmbrella-BlockDomain Playbook with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('playbookVersion7')]",
@@ -6968,7 +6968,7 @@
         "[extensionResourceId(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspace')), 'Microsoft.SecurityInsights/contentPackages', variables('_solutionId'))]"
       ],
       "properties": {
-        "description": "CiscoUmbrella-GetDomainInfo Playbook with template version 3.0.3",
+        "description": "CiscoUmbrella-GetDomainInfo Playbook with template version 3.0.2",
         "mainTemplate": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "[variables('playbookVersion8')]",
@@ -7306,7 +7306,7 @@
       "apiVersion": "2023-04-01-preview",
       "location": "[parameters('workspace-location')]",
       "properties": {
-        "version": "3.0.3",
+        "version": "3.0.2",
         "kind": "Solution",
         "contentSchemaVersion": "3.0.0",
         "displayName": "Cisco Umbrella",
