@@ -84,6 +84,7 @@ jobs:
         python $filePath
     
     - name: Azure Login to Dev Account 
+      if: '!cancelled()'
       uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
