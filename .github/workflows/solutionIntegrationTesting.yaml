@@ -46,11 +46,11 @@ jobs:
 
     - name: Get Access Token
       run: |
-        echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
+        echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_SECRETS
 
     - name: Download files from ADO
       run: |
-        curl -u :${{ env.accessToken }} \
+        curl -u :${{ secrets.accessToken }} \
         -o evaluateAndExtractTemplate.py \
         "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplate.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
         -o runUITests.py \
@@ -67,6 +67,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    
+    - name: Get Test Tenant Client ID and Tenant ID
+      run: |
+        echo "AZURE_TEST_CLIENT_ID=$(az keyvault secret show --name ClientId-Test --vault-name e2e-solIntegTesting-KV --query value -o tsv)" >> $GITHUB_SECRETS
+        echo "AZURE_TEST_TENANT_ID=$(az keyvault secret show --name TenantId-Test --vault-name e2e-solIntegTesting-KV --query value -o tsv)" >> $GITHUB_SECRETS
 
     - name: Azure Login to Test Tenant Account
       uses: azure/login@v2
