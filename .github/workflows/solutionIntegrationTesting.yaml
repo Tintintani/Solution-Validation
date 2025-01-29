@@ -1,4 +1,4 @@
-name: Solution Integration Testing
+name: Run Solution Integration Testing
 
 on: 
   pull_request:
@@ -78,29 +78,34 @@ jobs:
       run: |
         echo "TEST_TENANT_SUBSCRIPTION_ID=$(az account show --query id -o tsv)" >> $GITHUB_ENV
 
-    - name: Deploy Solution to Workspace, Evaluate and Extract Template Files
-      run: |
-        filePath="evaluateAndExtractTemplate.py"
-        python $filePath
+    # - name: Deploy Solution to Workspace, Evaluate and Extract Template Files
+    #   run: |
+    #     filePath="evaluateAndExtractTemplate.py"
+    #     python $filePath
     
     - name: Azure Login to Dev Account 
+      if: '!cancelled()'
       uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         allow-no-subscriptions: true
 
-    - name: Execute Tests on Testim
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_REPOSITORY: ${{ github.repository }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-      run: |
-        filePath="runUITests.py"
-        python $filePath
+    # - name: Execute Tests on Testim
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     GITHUB_REPOSITORY: ${{ github.repository }}
+    #     PR_NUMBER: ${{ github.event.pull_request.number }}
+    #   run: |
+    #     filePath="runUITests.py"
+    #     python $filePath
 
     - name: Delist Runner IP
       if: '!cancelled()'
       run: |
         agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address $agentIP
+    
+    - name: Failure
+      run: |
+        exit 1
