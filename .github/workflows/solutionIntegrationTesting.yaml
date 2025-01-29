@@ -46,7 +46,7 @@ jobs:
 
     - name: Get Access Token
       run: |
-        echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_SECRETS
+        echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
 
     - name: Download files from ADO
       run: |
@@ -70,8 +70,8 @@ jobs:
     
     - name: Get Test Tenant Client ID and Tenant ID
       run: |
-        echo "AZURE_TEST_CLIENT_ID=$(az keyvault secret show --name ClientId-Test --vault-name e2e-solIntegTesting-KV --query value -o tsv)" >> $GITHUB_SECRETS
-        echo "AZURE_TEST_TENANT_ID=$(az keyvault secret show --name TenantId-Test --vault-name e2e-solIntegTesting-KV --query value -o tsv)" >> $GITHUB_SECRETS
+        echo "AZURE_TEST_CLIENT_ID=$(az keyvault secret show --name ClientId-Test --vault-name e2e-solIntegTesting-KV --query value -o tsv)" >> $GITHUB_ENV
+        echo "AZURE_TEST_TENANT_ID=$(az keyvault secret show --name TenantId-Test --vault-name e2e-solIntegTesting-KV --query value -o tsv)" >> $GITHUB_ENV
 
     - name: Azure Login to Test Tenant Account
       uses: azure/login@v2
