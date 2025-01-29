@@ -105,11 +105,14 @@ jobs:
       run: |
         agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address $agentIP
+    - name: Mark Failure
+      run: |
+        exit 1
 
   Run-Mark-Success:
     name: Mark Success
     runs-on: ubuntu-latest
-    # needs: Run-solutionIntegration-Testimio
+    needs: Run-solutionIntegration-Testimio
     steps:
     - name: Mark Success
       run: echo "Success"
