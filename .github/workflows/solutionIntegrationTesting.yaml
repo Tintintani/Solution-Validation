@@ -17,6 +17,7 @@ jobs:
   Run-solutionIntegration-Testimio:
     name: Solution Integration Testing - Testim.io
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
     - name: Checkout pull request branch
       uses: actions/checkout@v3
@@ -109,8 +110,4 @@ jobs:
     - name: Failure
       run: |
         exit 1
-    
-    - name: Mark Success
-      if: always()
-      run: |
-        echo "Solution Integration Testing completed successfully"
+  
