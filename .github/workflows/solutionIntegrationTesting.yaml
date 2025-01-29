@@ -50,7 +50,7 @@ jobs:
 
     - name: Download files from ADO
       run: |
-        curl -u :${{ secrets.accessToken }} \
+        curl -u :${{ env.accessToken }} \
         -o evaluateAndExtractTemplate.py \
         "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplate.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
         -o runUITests.py \
@@ -76,8 +76,8 @@ jobs:
     - name: Azure Login to Test Tenant Account
       uses: azure/login@v2
       with:
-        client-id: ${{ secrets.AZURE_TEST_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TEST_TENANT_ID }}
+        client-id: ${{ env.AZURE_TEST_CLIENT_ID }}
+        tenant-id: ${{ env.AZURE_TEST_TENANT_ID }}
         allow-no-subscriptions: true
 
     - name: Get Test Tenant Subscription
