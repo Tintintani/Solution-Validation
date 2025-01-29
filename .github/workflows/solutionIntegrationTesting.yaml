@@ -110,7 +110,7 @@ jobs:
       run: |
         exit 1
 
-    -name: Mark Success
+    - name: Mark Success
       if: always()
       run: |
         exit 0
