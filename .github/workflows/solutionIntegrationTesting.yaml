@@ -110,12 +110,4 @@ jobs:
       continue-on-error: true
       run: |
         exit 1
-
-  Run-Mark-Success:
-    name: Mark Success
-    runs-on: ubuntu-latest
-    needs: Run-solutionIntegration-Testimio
-    steps:
-    - name: Mark Success
-      run: echo "Success"
   
