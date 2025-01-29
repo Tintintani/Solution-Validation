@@ -107,6 +107,7 @@ jobs:
         agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address $agentIP
     - name: Mark Failure
+      continue-on-error: true
       run: |
         exit 1
 
