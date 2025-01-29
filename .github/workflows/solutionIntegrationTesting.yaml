@@ -17,7 +17,6 @@ jobs:
   Run-solutionIntegration-Testimio:
     name: Solution Integration Testing - Testim.io
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
     - name: Checkout pull request branch
       uses: actions/checkout@v3
@@ -106,8 +105,12 @@ jobs:
       run: |
         agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address $agentIP
-    
-    - name: Failure
-      run: |
-        exit 1
+
+  Run-Mark Success:
+    name: Mark Success
+    runs-on: ubuntu-latest
+    # needs: Run-solutionIntegration-Testimio
+    steps:
+    - name: Mark Success
+      run: echo "Success"
   
