@@ -45,9 +45,9 @@ jobs:
         agentIP=$(curl -s https://api.ipify.org/)
         az keyvault network-rule add --name e2e-solIntegTesting-KV --ip-address $agentIP --query properties.networkAcls.ipRules
 
-    - name: Get Access Token
-      run: |
-        echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
+    # - name: Get Access Token
+    #   run: |
+    #     echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
 
     - name: Print
       run: |
@@ -61,7 +61,7 @@ jobs:
 
     - name: Download files from ADO
       run: |
-        curl -u :${{ env.accessToken }} \
+        curl -u :$(az account get-access-token -o tsv --query accessToken) \
         -o evaluateAndExtractTemplate.py \
         "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplate.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
         -o runUITests.py \
