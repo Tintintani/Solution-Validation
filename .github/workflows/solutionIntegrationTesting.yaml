@@ -1,7 +1,7 @@
 name: Run Solution Integration Testing
 
 on: 
-  pull_request_target:
+  pull_request:
     types: [opened, edited, reopened, synchronize]
     branches:
       - master
@@ -57,7 +57,7 @@ jobs:
 
     - name: Download files from ADO
       run: |
-        curl -u :${{ env.accessToken }} \
+        curl -u :$(az account get-access-token -o tsv --query accessToken) \
         -o evaluateAndExtractTemplate.py \
         "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplate.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
         -o runUITests.py \
