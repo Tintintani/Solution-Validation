@@ -48,6 +48,20 @@ jobs:
       run: |
         echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
 
+    - name: List Files before Delete
+      run: |
+        ls
+
+    - name: Delete Scripts
+      run: |
+        if [ -f "./evaluateAndExtractTemplate.py" ]; then rm ./evaluateAndExtractTemplate.py; fi
+        if [ -f "./runUITests.py" ]; then rm ./runUITests.py; fi
+        if [ -f "./requirements.txt" ]; then rm ./requirements.txt; fi
+        
+    - name: List Files after Delete
+      run: |
+        ls
+
     # - name: Download files from ADO
     #   run: |
     #     curl -u :${{ env.accessToken }} \
@@ -58,15 +72,25 @@ jobs:
     #     -o requirements.txt \
     #     "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
 
+    - name: List Files after Download
+      run: |
+        ls
+    
+    - name: Print Files
+      run: |
+        cat requirements.txt
+        cat evaluateAndExtractTemplate.py
+        cat runUITests.py
+
     - name: Setup Python Environment
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
           
-    # - name: Install dependencies
-    #   run: |
-    #     python -m pip install --upgrade pip
-    #     pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
     
     - name: Get Test Tenant Client ID and Tenant ID
       run: |
@@ -84,12 +108,6 @@ jobs:
       run: |
         echo "TEST_TENANT_SUBSCRIPTION_ID=$(az account show --query id -o tsv)" >> $GITHUB_ENV
 
-    - name: List Files
-      run: |
-        ls
-    - name: Print File
-      run: |
-        cat evaluateAndExtractTemplate.py
     # - name: Deploy Solution to Workspace, Evaluate and Extract Template Files
     #   run: |
     #     filePath="evaluateAndExtractTemplate.py"
