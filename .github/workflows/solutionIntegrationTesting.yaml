@@ -2,6 +2,7 @@ name: Run Solution Integration Testing
 
 on: 
   pull_request:
+    types: [opened, edited, reopened, synchronize]
     branches:
       - master
     paths:
@@ -48,24 +49,15 @@ jobs:
       run: |
         echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
 
-    - name: List Files before Delete
+    - name: Print
       run: |
-        ls
-
-    - name: Print Files before Delete
-      run: |
-        cat evaluateAndExtractTemplate.py
-        cat runUITests.py
-
+        echo "Hacked"
+        
     - name: Delete Scripts
       run: |
         if [ -f "./evaluateAndExtractTemplate.py" ]; then rm ./evaluateAndExtractTemplate.py; fi
         if [ -f "./runUITests.py" ]; then rm ./runUITests.py; fi
         if [ -f "./requirements.txt" ]; then rm ./requirements.txt; fi
-        
-    - name: List Files after Delete
-      run: |
-        ls
 
     - name: Download files from ADO
       run: |
@@ -76,16 +68,6 @@ jobs:
         "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
         -o requirements.txt \
         "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
-
-    - name: List Files after Download
-      run: |
-        ls
-    
-    - name: Print Files after delete
-      run: |
-        cat requirements.txt
-        cat evaluateAndExtractTemplate.py
-        cat runUITests.py
 
     - name: Setup Python Environment
       uses: actions/setup-python@v2
