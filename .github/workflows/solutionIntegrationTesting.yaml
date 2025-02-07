@@ -51,8 +51,8 @@ jobs:
     # - name: Download files from ADO
     #   run: |
     #     curl -u :${{ env.accessToken }} \
-    #     -o evaluateAndExtractTemplate.py \
-    #     "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplate.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+        # -o evaluateAndExtractTemplate.py \
+        # "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplate.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
     #     -o runUITests.py \
     #     "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
     #     -o requirements.txt \
@@ -63,10 +63,10 @@ jobs:
       with:
         python-version: '3.x'
           
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+    # - name: Install dependencies
+    #   run: |
+    #     python -m pip install --upgrade pip
+    #     pip install -r requirements.txt
     
     - name: Get Test Tenant Client ID and Tenant ID
       run: |
