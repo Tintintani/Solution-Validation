@@ -43,7 +43,7 @@ jobs:
     - name: Whitelist Runner IP
       run: |
         agentIP=$(curl -s https://api.ipify.org/)
-        az keyvault network-rule add --name e2e-solIntegTesting-KV --ip-address $agentIP
+        az keyvault network-rule add --name e2e-solIntegTesting-KV --ip-address $agentIP --query properties.networkAcls.ipRules
 
     - name: Get Access Token
       run: |
@@ -117,4 +117,4 @@ jobs:
       if: '!cancelled()'
       run: |
         agentIP=$(curl -s https://api.ipify.org/)
-        az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address $agentIP
+        az keyvault network-rule remove --name e2e-solIntegTesting-KV --ip-address $agentIP --query properties.networkAcls.ipRules
