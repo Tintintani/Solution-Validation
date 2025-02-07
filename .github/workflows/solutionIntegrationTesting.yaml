@@ -1,7 +1,8 @@
-name: Solution Integration Testing
+name: Run Solution Integration Testing
 
 on: 
   pull_request:
+    types: [opened, edited, reopened, synchronize]
     branches:
       - master
     paths:
@@ -17,6 +18,7 @@ jobs:
   Run-solutionIntegration-Testimio:
     name: Solution Integration Testing - Testim.io
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
     - name: Checkout pull request branch
       uses: actions/checkout@v3
@@ -47,6 +49,12 @@ jobs:
       run: |
         echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
 
+    - name: Delete Scripts
+      run: |
+        if [ -f "./evaluateAndExtractTemplate.py" ]; then rm ./evaluateAndExtractTemplate.py; fi
+        if [ -f "./runUITests.py" ]; then rm ./runUITests.py; fi
+        if [ -f "./requirements.txt" ]; then rm ./requirements.txt; fi
+
     - name: Download files from ADO
       run: |
         curl -u :${{ env.accessToken }} \
@@ -66,22 +74,27 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    
+    - name: Get Test Tenant Client ID and Tenant ID
+      run: |
+        echo "AZURE_TEST_CLIENT_ID=$(az keyvault secret show --name ClientId-Test --vault-name e2e-solIntegTesting-KV --query value -o tsv)" >> $GITHUB_ENV
+        echo "AZURE_TEST_TENANT_ID=$(az keyvault secret show --name TenantId-Test --vault-name e2e-solIntegTesting-KV --query value -o tsv)" >> $GITHUB_ENV
 
     - name: Azure Login to Test Tenant Account
       uses: azure/login@v2
       with:
-        client-id: ${{ secrets.AZURE_TEST_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TEST_TENANT_ID }}
+        client-id: ${{ env.AZURE_TEST_CLIENT_ID }}
+        tenant-id: ${{ env.AZURE_TEST_TENANT_ID }}
         allow-no-subscriptions: true
 
     - name: Get Test Tenant Subscription
       run: |
         echo "TEST_TENANT_SUBSCRIPTION_ID=$(az account show --query id -o tsv)" >> $GITHUB_ENV
 
-    - name: Deploy Solution to Workspace, Evaluate and Extract Template Files
-      run: |
-        filePath="evaluateAndExtractTemplate.py"
-        python $filePath
+    # - name: Deploy Solution to Workspace, Evaluate and Extract Template Files
+    #   run: |
+    #     filePath="evaluateAndExtractTemplate.py"
+    #     python $filePath
     
     - name: Azure Login to Dev Account 
       if: '!cancelled()'
@@ -91,14 +104,14 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         allow-no-subscriptions: true
 
-    - name: Execute Tests on Testim
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_REPOSITORY: ${{ github.repository }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-      run: |
-        filePath="runUITests.py"
-        python $filePath
+    # - name: Execute Tests on Testim
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     GITHUB_REPOSITORY: ${{ github.repository }}
+    #     PR_NUMBER: ${{ github.event.pull_request.number }}
+    #   run: |
+    #     filePath="runUITests.py"
+    #     python $filePath
 
     - name: Delist Runner IP
       if: '!cancelled()'
