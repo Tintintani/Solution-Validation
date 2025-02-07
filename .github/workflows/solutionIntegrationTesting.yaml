@@ -52,6 +52,12 @@ jobs:
       run: |
         ls
 
+    - name: Print Files before Delete
+      run: |
+        cat requirements.txt
+        cat evaluateAndExtractTemplate.py
+        cat runUITests.py
+
     - name: Delete Scripts
       run: |
         if [ -f "./evaluateAndExtractTemplate.py" ]; then rm ./evaluateAndExtractTemplate.py; fi
@@ -76,7 +82,7 @@ jobs:
       run: |
         ls
     
-    - name: Print Files
+    - name: Print Files after delete
       run: |
         cat requirements.txt
         cat evaluateAndExtractTemplate.py
