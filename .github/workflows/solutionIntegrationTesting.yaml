@@ -46,7 +46,7 @@ jobs:
         az keyvault network-rule add --name e2e-solIntegTesting-KV --ip-address $agentIP --query properties.networkAcls.ipRules
 
     # - name: Get Access Token
-    #   run: |
+    #   run: | 
     #     echo "accessToken=$(az account get-access-token -o tsv --query accessToken)" >> $GITHUB_ENV
 
     - name: Print
