@@ -54,7 +54,6 @@ jobs:
 
     - name: Print Files before Delete
       run: |
-        cat requirements.txt
         cat evaluateAndExtractTemplate.py
         cat runUITests.py
 
