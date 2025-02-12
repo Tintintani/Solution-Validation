@@ -74,8 +74,8 @@ jobs:
     - name: Azure Login to Test Tenant Account
       uses: azure/login@v2
       with:
-        client-id: $(az keyvault secret show --name ClientId-Test --vault-name e2e-solIntegTesting-KV --query value -o tsv)
-        tenant-id: $(az keyvault secret show --name TenantId-Test --vault-name e2e-solIntegTesting-KV --query value -o tsv)
+        client-id: ${{az keyvault secret show --name ClientId-Test --vault-name e2e-solIntegTesting-KV --query value -o tsv}}
+        tenant-id: ${{az keyvault secret show --name TenantId-Test --vault-name e2e-solIntegTesting-KV --query value -o tsv}}
         allow-no-subscriptions: true
 
     - name: Get Test Tenant Subscription
