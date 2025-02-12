@@ -16,8 +16,8 @@ jobs:
     - name: Azure Login to Dev Account 
       uses: azure/login@v2
       with:
-        client-id: "95628a72-80d7-40dc-8c1d-bc314abe12b0
-        tenant-id: "72f988bf-86f1-41af-91ab-2d7cd011db47
+        client-id: "95628a72-80d7-40dc-8c1d-bc314abe12b0"
+        tenant-id: "72f988bf-86f1-41af-91ab-2d7cd011db47"
         allow-no-subscriptions: true
     - name: Show Account Details
       run: |
