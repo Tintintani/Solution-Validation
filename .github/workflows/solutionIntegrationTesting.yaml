@@ -1,14 +1,13 @@
 name: Run Solution Integration Testing
 
 on: 
-  pull_request:
+  pull_request_target:
     types: [opened, edited, reopened, synchronize]
     branches:
       - master
     paths:
       - 'Solutions/**/Package/mainTemplate.json'
     
-    workflow_dispatch: # Allows to run workflow manually from the Actions tab
 permissions:
   id-token: write
   contents: read
@@ -54,6 +53,7 @@ jobs:
         if [ -f "./evaluateAndExtractTemplate.py" ]; then rm ./evaluateAndExtractTemplate.py; fi
         if [ -f "./runUITests.py" ]; then rm ./runUITests.py; fi
         if [ -f "./requirements.txt" ]; then rm ./requirements.txt; fi
+        if [ -f "./config.json" ]; then rm ./config.json; fi
 
     - name: Download files from ADO
       run: |
@@ -63,7 +63,9 @@ jobs:
         -o runUITests.py \
         "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
         -o requirements.txt \
-        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
+        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+        -o config.json \
+        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/config.json&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
 
     - name: Setup Python Environment
       uses: actions/setup-python@v2
@@ -91,10 +93,10 @@ jobs:
       run: |
         echo "TEST_TENANT_SUBSCRIPTION_ID=$(az account show --query id -o tsv)" >> $GITHUB_ENV
 
-    # - name: Deploy Solution to Workspace, Evaluate and Extract Template Files
-    #   run: |
-    #     filePath="evaluateAndExtractTemplate.py"
-    #     python $filePath
+    - name: Deploy Solution to Workspace, Evaluate and Extract Template Files
+      run: |
+        filePath="evaluateAndExtractTemplate.py"
+        python $filePath
     
     - name: Azure Login to Dev Account 
       if: '!cancelled()'
@@ -104,14 +106,14 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         allow-no-subscriptions: true
 
-    # - name: Execute Tests on Testim
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #     GITHUB_REPOSITORY: ${{ github.repository }}
-    #     PR_NUMBER: ${{ github.event.pull_request.number }}
-    #   run: |
-    #     filePath="runUITests.py"
-    #     python $filePath
+    - name: Execute Tests on Testim
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        filePath="runUITests.py"
+        python $filePath
 
     - name: Delist Runner IP
       if: '!cancelled()'
