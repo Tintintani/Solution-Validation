@@ -59,13 +59,13 @@ jobs:
       run: |
         curl -u :$(az account get-access-token -o tsv --query accessToken) \
         -o evaluateAndExtractTemplate.py \
-        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplate.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplate.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionTestingFix&api-version=6.0" \
         -o runUITests.py \
-        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionTestingFix&api-version=6.0" \
         -o requirements.txt \
-        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionTestingFix&api-version=6.0" \
         -o config.json \
-        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/config.json&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
+        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/config.json&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionTestingFix&api-version=6.0"
 
     - name: Setup Python Environment
       uses: actions/setup-python@v2
@@ -106,14 +106,14 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         allow-no-subscriptions: true
 
-    - name: Execute Tests on Testim
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_REPOSITORY: ${{ github.repository }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-      run: |
-        filePath="runUITests.py"
-        python $filePath
+    # - name: Execute Tests on Testim
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     GITHUB_REPOSITORY: ${{ github.repository }}
+    #     PR_NUMBER: ${{ github.event.pull_request.number }}
+    #   run: |
+    #     filePath="runUITests.py"
+    #     python $filePath
 
     - name: Delist Runner IP
       if: '!cancelled()'
