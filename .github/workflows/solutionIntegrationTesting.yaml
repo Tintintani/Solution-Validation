@@ -49,16 +49,19 @@ jobs:
         if [ -f "./evaluateAndExtractTemplate.py" ]; then rm ./evaluateAndExtractTemplate.py; fi
         if [ -f "./runUITests.py" ]; then rm ./runUITests.py; fi
         if [ -f "./requirements.txt" ]; then rm ./requirements.txt; fi
+        if [ -f "./config.json" ]; then rm ./config.json; fi
 
     - name: Download files from ADO #TODO: update repo link to main
       run: |
         curl -u :$(az account get-access-token -o tsv --query accessToken) \
         -o evaluateAndExtractTemplate.py \
-        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplate.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/evaluateAndExtractTemplate.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionTestingFix&api-version=6.0" \
         -o runUITests.py \
-        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0" \
+        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/.scripts/runUITests.py&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionTestingFix&api-version=6.0" \
         -o requirements.txt \
-        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionIntegrationTesting&api-version=6.0"
+        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/requirements.txt&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionTestingFix&api-version=6.0" \
+        -o config.json \
+        "https://dev.azure.com/msazure/One/_apis/git/repositories/Sentinel-CATUtilities/items?path=/SolutionIntegrationTesting/config.json&versionDescriptor.versionType=Branch&versionDescriptor.version=users/tanishqarora/solutionTestingFix&api-version=6.0"
 
     - name: Setup Python Environment
       uses: actions/setup-python@v2
@@ -86,11 +89,11 @@ jobs:
       run: |
         echo "TEST_TENANT_SUBSCRIPTION_ID=$(az account show --query id -o tsv)" >> $GITHUB_ENV
 
-    # - name: Deploy Solution to Workspace, Evaluate and Extract Template Files
-    #   continue-on-error: true # Continues even after failing so as to not block the PR
-    #   run: |
-    #     filePath="evaluateAndExtractTemplate.py"
-    #     python $filePath
+    - name: Deploy Solution to Workspace, Evaluate and Extract Template Files
+      continue-on-error: true # Continues even after failing so as to not block the PR
+      run: |
+        filePath="evaluateAndExtractTemplate.py"
+        python $filePath
     
     - name: Azure Login to Dev Account 
       uses: azure/login@a65d910e8af852a8061c627c456678983e180302
